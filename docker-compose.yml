@@ -1,0 +1,17 @@
+services:
+  web:
+    image: react-starter:latest
+    build:
+      context: .
+      target: runtime
+    container_name: react-starter-prod
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

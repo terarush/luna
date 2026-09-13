@@ -1,0 +1,10 @@
+{
+  "home": {
+    "badge": "React Starter",
+    "title": "TeraRush React Starter",
+    "description": "Production-ready foundation for your next web app. Vite, TanStack Router, React Query, Tailwind, and more.",
+    "logoAlt": "TeraRush logo",
+    "themeToggle": "Toggle theme",
+    "getStarted": "Get Started"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "error": {
+    "badge": "Kesalahan 404",
+    "title": "Halaman tidak ditemukan",
+    "description": "Maaf, kami tidak dapat menemukan halaman yang Anda cari. Halaman mungkin telah dipindahkan atau dihapus.",
+    "goHome": "Kembali ke beranda"
+  }
+}
