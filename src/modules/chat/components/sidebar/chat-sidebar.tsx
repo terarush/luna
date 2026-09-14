@@ -1,28 +1,18 @@
 import * as React from "react"
 import { useTranslation } from "react-i18next"
-import { Plus, Search, MessageSquare } from "lucide-react"
-import { Button } from "#/components/ui/button"
-import { Input } from "#/components/ui/input"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-} from "#/components/ui/sidebar"
+import { Search, Plus, Pin, MessageSquareText, X } from "lucide-react"
 import { useChatStore } from "../../hooks/use-chat-store"
 import { ChatHistoryItem } from "./chat-history-item"
 import { ChatUserFooter } from "./chat-user-footer"
+import { cn } from "@/lib/utils"
 
 interface ChatSidebarProps {
+  open: boolean
+  onToggle: () => void
   onOpenSettings: () => void
 }
 
-export function ChatSidebar({ onOpenSettings }: ChatSidebarProps) {
+export function ChatSidebar({ open, onToggle, onOpenSettings }: ChatSidebarProps) {
   const { t } = useTranslation()
   const {
     sessions,
@@ -46,91 +36,113 @@ export function ChatSidebar({ onOpenSettings }: ChatSidebarProps) {
   const unpinnedSessions = filteredSessions.filter((s) => !s.pinned)
 
   return (
-    <Sidebar>
-      <SidebarHeader className="flex flex-col gap-2 p-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 px-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <MessageSquare className="h-4 w-4" />
+    <aside
+      className={cn(
+        "z-20 flex shrink-0 flex-col border-r border-zinc-200 bg-white transition-[width] duration-300 ease-in-out",
+        "dark:border-zinc-800 dark:bg-zinc-900",
+        open ? "w-72" : "w-0 border-r-0"
+      )}
+      aria-hidden={!open}
+    >
+      <div className="flex h-full w-72 flex-col overflow-hidden">
+        {/* Brand row */}
+        <div className="flex h-14 shrink-0 items-center justify-between px-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white shadow-sm shadow-sky-500/25 dark:from-sky-500 dark:to-sky-700">
+              <MessageSquareText className="size-4" strokeWidth={2.2} />
             </div>
-            <span className="text-sm font-semibold">Open WebUI</span>
+            <div className="leading-tight">
+              <p className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                Luna
+              </p>
+              <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
+                AI Chat
+              </p>
+            </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => createNewSession()}
-            title={t("chat.sidebar.newChat")}
+          <button
+            onClick={onToggle}
+            className="flex size-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            aria-label={t("chat.sidebar.newChat")}
           >
-            <Plus className="h-4 w-4" />
-          </Button>
+            <X className="size-4" />
+          </button>
         </div>
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input
-            placeholder={t("chat.sidebar.searchPlaceholder")}
-            value={searchFilter}
-            onChange={(e) => setSearchFilter(e.target.value)}
-            className="h-8 pl-8 text-sm"
-          />
-        </div>
-      </SidebarHeader>
 
-      <SidebarContent>
-        {pinnedSessions.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>{t("chat.sidebar.pinned")}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {pinnedSessions.map((session) => (
-                  <SidebarMenuItem key={session.id}>
-                    <ChatHistoryItem
-                      session={session}
-                      isActive={session.id === activeSessionId}
-                      onSelect={selectSession}
-                      onRename={renameSession}
-                      onTogglePin={togglePinSession}
-                      onDelete={deleteSession}
-                    />
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        {/* New chat + search */}
+        <div className="shrink-0 space-y-2 px-3 pb-3">
+          <button
+            onClick={() => createNewSession()}
+            className="group flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-[0.98] dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+          >
+            <Plus className="size-4" strokeWidth={2.2} />
+            {t("chat.sidebar.newChat")}
+          </button>
 
-        {unpinnedSessions.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>{t("chat.sidebar.recent")}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {unpinnedSessions.map((session) => (
-                  <SidebarMenuItem key={session.id}>
-                    <ChatHistoryItem
-                      session={session}
-                      isActive={session.id === activeSessionId}
-                      onSelect={selectSession}
-                      onRename={renameSession}
-                      onTogglePin={togglePinSession}
-                      onDelete={deleteSession}
-                    />
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-
-        {filteredSessions.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-2 py-8 text-muted-foreground">
-            <Search className="h-8 w-8" />
-            <p className="text-sm">{t("chat.header.noModelFound")}</p>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-zinc-400" />
+            <input
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              placeholder={t("chat.sidebar.searchPlaceholder")}
+              className="h-8 w-full rounded-lg border border-zinc-200 bg-zinc-50 pl-8 pr-2 text-xs text-zinc-800 placeholder:text-zinc-400 outline-none transition-colors focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-sky-500"
+            />
           </div>
-        )}
-      </SidebarContent>
+        </div>
 
-      <SidebarFooter>
+        {/* Session list */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+          {pinnedSessions.length > 0 && (
+            <div className="mb-1">
+              <p className="flex items-center gap-1.5 px-2 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 dark:text-zinc-500">
+                <Pin className="size-3" />
+                {t("chat.sidebar.pinned")}
+              </p>
+              {pinnedSessions.map((session) => (
+                <ChatHistoryItem
+                  key={session.id}
+                  session={session}
+                  isActive={session.id === activeSessionId}
+                  onSelect={selectSession}
+                  onRename={renameSession}
+                  onTogglePin={togglePinSession}
+                  onDelete={deleteSession}
+                />
+              ))}
+            </div>
+          )}
+
+          {unpinnedSessions.length > 0 && (
+            <div>
+              <p className="px-2 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 dark:text-zinc-500">
+                {t("chat.sidebar.recent")}
+              </p>
+              {unpinnedSessions.map((session) => (
+                <ChatHistoryItem
+                  key={session.id}
+                  session={session}
+                  isActive={session.id === activeSessionId}
+                  onSelect={selectSession}
+                  onRename={renameSession}
+                  onTogglePin={togglePinSession}
+                  onDelete={deleteSession}
+                />
+              ))}
+            </div>
+          )}
+
+          {filteredSessions.length === 0 && (
+            <div className="flex flex-col items-center gap-2 py-10 text-center">
+              <Search className="size-6 text-zinc-300 dark:text-zinc-600" />
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                {t("chat.header.noModelFound")}
+              </p>
+            </div>
+          )}
+        </div>
+
         <ChatUserFooter onOpenSettings={onOpenSettings} />
-      </SidebarFooter>
-    </Sidebar>
+      </div>
+    </aside>
   )
 }

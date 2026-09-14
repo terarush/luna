@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Copy, Pencil, FileText, Image } from "lucide-react"
-import { Button } from "#/components/ui/button"
+import { Copy, Pencil, FileText, Image as ImageIcon } from "lucide-react"
 import { toast } from "sonner"
 import type { ChatMessage } from "../../types"
 
@@ -10,44 +9,52 @@ interface UserMessageProps {
 
 export function UserMessage({ message }: UserMessageProps) {
   const { t } = useTranslation()
+
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content)
     toast.success(t("chat.messages.copySuccess"))
   }
 
   return (
-    <div className="flex justify-end gap-2 group/msg">
-      <div className="flex flex-col items-end gap-1 max-w-[80%]">
+    <div className="flex justify-end gap-3">
+      <div className="flex max-w-[85%] flex-col items-end gap-1.5 sm:max-w-[75%]">
         {message.attachments && message.attachments.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 justify-end">
+          <div className="flex flex-wrap justify-end gap-1.5">
             {message.attachments.map((att) => (
-              <div
+              <span
                 key={att.id}
-                className="flex items-center gap-1.5 bg-muted rounded-md px-2 py-1 text-xs"
+                className="inline-flex max-w-[12rem] items-center gap-1.5 truncate rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[11px] text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
               >
                 {att.type.startsWith("image/") ? (
-                  <Image className="h-3.5 w-3.5" />
+                  <ImageIcon className="size-3 shrink-0 text-zinc-400" />
                 ) : (
-                  <FileText className="h-3.5 w-3.5" />
+                  <FileText className="size-3 shrink-0 text-zinc-400" />
                 )}
-                <span className="truncate max-w-[120px]">{att.name}</span>
-              </div>
+                <span className="truncate">{att.name}</span>
+              </span>
             ))}
           </div>
         )}
-        <div className="rounded-2xl rounded-tr-sm bg-primary text-primary-foreground px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap">
+        <div className="rounded-2xl rounded-br-md bg-zinc-900 px-4 py-2.5 text-[13.5px] leading-relaxed text-zinc-50 whitespace-pre-wrap dark:bg-zinc-100 dark:text-zinc-950">
           {message.content}
         </div>
-        <div className="hidden group-hover/msg:flex items-center gap-1">
-          <Button variant="ghost" size="icon-sm" className="h-6 w-6" onClick={handleCopy}>
-            <Copy className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon-sm" className="h-6 w-6">
-            <Pencil className="h-3.5 w-3.5" />
-          </Button>
+        <div className="flex items-center gap-0.5 text-zinc-400 opacity-0 transition-opacity duration-150 group-hover:opacity-100 dark:text-zinc-500">
+          <button
+            onClick={handleCopy}
+            className="flex size-6 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            aria-label={t("chat.messages.copyCode")}
+          >
+            <Copy className="size-3" />
+          </button>
+          <button
+            className="flex size-6 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            aria-label={t("chat.sidebar.rename")}
+          >
+            <Pencil className="size-3" />
+          </button>
         </div>
       </div>
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-medium shrink-0">
+      <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-200 to-zinc-300 text-[11px] font-bold text-zinc-700 dark:from-zinc-700 dark:to-zinc-800 dark:text-zinc-200">
         U
       </div>
     </div>

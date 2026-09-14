@@ -8,15 +8,14 @@ import {
   Volume2,
   Sparkles,
 } from "lucide-react"
+import { toast } from "sonner"
 import ReactMarkdown from "react-markdown"
 import rehypeHighlight from "rehype-highlight"
-import { Button } from "#/components/ui/button"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 import type { ChatMessage } from "../../types"
 import { ThinkingAccordion } from "./thinking-accordion"
 import { CodeBlock } from "./code-block"
 import { AVAILABLE_MODELS } from "../../hooks/use-chat-store"
+import { cn } from "@/lib/utils"
 
 interface AssistantMessageProps {
   message: ChatMessage
@@ -24,34 +23,25 @@ interface AssistantMessageProps {
 
 export function AssistantMessage({ message }: AssistantMessageProps) {
   const { t } = useTranslation()
-  const [copied, setCopied] = React.useState(false)
   const [feedback, setFeedback] = React.useState<"good" | "bad" | null>(null)
 
   const modelName = AVAILABLE_MODELS.find((m) => m.id === message.model)?.name ?? message.model
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content)
-    setCopied(true)
     toast.success(t("chat.messages.copySuccess"))
-    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
-    <div className="flex gap-2 group/msg">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
-        <Sparkles className="h-4 w-4" />
+    <div className="group flex gap-3">
+      <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white shadow-sm dark:bg-zinc-100 dark:text-zinc-950">
+        <Sparkles className="size-3.5" strokeWidth={2.2} />
       </div>
-      <div className="flex flex-col gap-1 max-w-[80%] min-w-0">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span className="font-medium">{modelName}</span>
-          {message.thinking && !message.isStreaming && (
-            <span className="text-[10px]">
-              {t("chat.messages.thoughtDuration", {
-                seconds: message.thinkingDuration,
-              })}
-            </span>
-          )}
-        </div>
+
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-400 dark:text-zinc-500">
+          {modelName}
+        </p>
 
         {message.thinking && (
           <ThinkingAccordion
@@ -61,7 +51,7 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
           />
         )}
 
-        <div className="prose prose-sm dark:prose-invert max-w-none">
+        <div className="prose-chat min-w-0">
           <ReactMarkdown
             rehypePlugins={[rehypeHighlight]}
             components={{
@@ -69,17 +59,10 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
                 const match = /language-(\w+)/.exec(className || "")
                 const isBlock = String(children).includes("\n")
                 if (isBlock) {
-                  return (
-                    <CodeBlock language={match?.[1]}>
-                      {String(children).replace(/\n$/, "")}
-                    </CodeBlock>
-                  )
+                  return <CodeBlock language={match?.[1]}>{String(children).replace(/\n$/, "")}</CodeBlock>
                 }
                 return (
-                  <code
-                    className={cn("rounded bg-muted px-1.5 py-0.5 text-sm", className)}
-                    {...props}
-                  >
+                  <code className={className} {...props}>
                     {children}
                   </code>
                 )
@@ -91,45 +74,67 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
         </div>
 
         {message.isStreaming && (
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-            <span>Generating...</span>
+          <div className="mt-1 flex items-center gap-1.5 pl-0.5 text-[11px] text-zinc-400 dark:text-zinc-500">
+            <span className="animate-pulse-dot size-1.5 rounded-full bg-zinc-400" />
+            Generating
+            <span className="animate-pulse-dot size-1.5 rounded-full bg-zinc-400" style={{ animationDelay: "0.2s" }} />
+            <span className="animate-pulse-dot size-1.5 rounded-full bg-zinc-400" style={{ animationDelay: "0.4s" }} />
           </div>
         )}
 
         {!message.isStreaming && message.content && (
-          <div className="flex items-center gap-1 mt-1">
-            <Button variant="ghost" size="icon-sm" className="h-6 w-6" onClick={handleCopy}>
-              <Copy className={cn("h-3.5 w-3.5", copied && "text-green-500")} />
-            </Button>
-            <Button variant="ghost" size="icon-sm" className="h-6 w-6">
-              <RotateCcw className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className={cn("h-6 w-6", feedback === "good" && "text-green-500")}
+          <div
+            className={cn(
+              "mt-1.5 flex items-center gap-0.5 text-zinc-400 opacity-0 transition-opacity duration-150 group-hover:opacity-100 dark:text-zinc-500"
+            )}
+          >
+            <button
+              onClick={handleCopy}
+              className="flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+              aria-label={t("chat.messages.copyCode")}
+            >
+              <Copy className="size-3" />
+            </button>
+            <button
+              className="flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+              aria-label={t("chat.messages.regenerate")}
+            >
+              <RotateCcw className="size-3" />
+            </button>
+            <button
               onClick={() => setFeedback(feedback === "good" ? null : "good")}
+              className={cn(
+                "flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800",
+                feedback === "good"
+                  ? "text-zinc-950 dark:text-zinc-50"
+                  : "hover:text-zinc-700 dark:hover:text-zinc-200"
+              )}
+              aria-label={t("chat.messages.goodResponse")}
             >
-              <ThumbsUp className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className={cn("h-6 w-6", feedback === "bad" && "text-red-500")}
+              <ThumbsUp className="size-3" />
+            </button>
+            <button
               onClick={() => setFeedback(feedback === "bad" ? null : "bad")}
+              className={cn(
+                "flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800",
+                feedback === "bad"
+                  ? "text-zinc-950 dark:text-zinc-50"
+                  : "hover:text-zinc-700 dark:hover:text-zinc-200"
+              )}
+              aria-label={t("chat.messages.badResponse")}
             >
-              <ThumbsDown className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" className="h-6 w-6">
-              <Volume2 className="h-3.5 w-3.5" />
-            </Button>
+              <ThumbsDown className="size-3" />
+            </button>
+            <button
+              className="flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+              aria-label={t("chat.messages.readAloud")}
+            >
+              <Volume2 className="size-3" />
+            </button>
 
             {message.totalTokens && message.tokensPerSecond && (
-              <span className="ml-2 text-[10px] text-muted-foreground bg-muted rounded-full px-2 py-0.5">
-                {message.tokensPerSecond} tokens/s
-                {" · "}
-                {message.totalTokens} tokens
+              <span className="ml-1.5 rounded-md px-1.5 py-px font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
+                {message.tokensPerSecond} tok/s · {message.totalTokens} tok
               </span>
             )}
           </div>

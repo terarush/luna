@@ -5,14 +5,12 @@ import {
   Square,
   Paperclip,
   Globe,
-  Brain,
+  BrainCircuit,
   Mic,
 } from "lucide-react"
-import { Button } from "#/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/ui/tooltip"
-import { cn } from "@/lib/utils"
 import { useChatStore } from "../../hooks/use-chat-store"
 import { ChatAttachmentPreview } from "./chat-attachment-preview"
+import { cn } from "@/lib/utils"
 
 export function ChatInputBar() {
   const { t } = useTranslation()
@@ -35,9 +33,7 @@ export function ChatInputBar() {
     if (!input.trim()) return
     sendMessage(input)
     setInput("")
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"
-    }
+    if (textareaRef.current) textareaRef.current.style.height = "auto"
   }, [input, sendMessage])
 
   const handleKeyDown = React.useCallback(
@@ -50,15 +46,12 @@ export function ChatInputBar() {
     [handleSend]
   )
 
-  const handleInput = React.useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setInput(e.target.value)
-      const ta = e.target
-      ta.style.height = "auto"
-      ta.style.height = Math.min(ta.scrollHeight, 200) + "px"
-    },
-    []
-  )
+  const handleInput = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value)
+    const ta = e.target
+    ta.style.height = "auto"
+    ta.style.height = Math.min(ta.scrollHeight, 200) + "px"
+  }, [])
 
   const handleFileChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,10 +71,25 @@ export function ChatInputBar() {
     [addAttachment]
   )
 
+  const toolButtonClass = (active = false) =>
+    cn(
+      "flex size-8 shrink-0 items-center justify-center rounded-lg outline-none transition-all duration-150",
+      active
+        ? "bg-zinc-950 text-white shadow-sm hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+        : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200",
+      "focus-visible:ring-2 focus-visible:ring-zinc-400/50"
+    )
+
   return (
-    <div className="border-t bg-background">
-      <div className="mx-auto max-w-4xl px-4 py-3">
-        <div className="rounded-2xl border bg-background shadow-sm focus-within:ring-2 focus-within:ring-ring/20 transition-shadow">
+    <div className="shrink-0 border-t border-zinc-200/70 bg-gradient-to-b from-transparent to-zinc-100/60 px-3 pb-3 pt-2 dark:border-zinc-800/70 dark:to-zinc-950/40 sm:px-4">
+      <div className="mx-auto max-w-3xl">
+        <div
+          className={cn(
+            "overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg shadow-zinc-950/4 transition-all duration-200",
+            "focus-within:border-zinc-300 focus-within:shadow-zinc-950/8 focus-within:ring-4 focus-within:ring-zinc-500/10",
+            "dark:border-zinc-700 dark:bg-zinc-900 dark:focus-within:border-zinc-600"
+          )}
+        >
           <ChatAttachmentPreview />
 
           <textarea
@@ -91,10 +99,10 @@ export function ChatInputBar() {
             onKeyDown={handleKeyDown}
             placeholder={t("chat.input.placeholder")}
             rows={1}
-            className="w-full resize-none bg-transparent px-4 pt-3 pb-1 text-sm outline-none placeholder:text-muted-foreground min-h-[44px] max-h-[200px]"
+            className="block max-h-[200px] w-full resize-none bg-transparent px-4 pb-0.5 pt-3.5 text-[14px] leading-relaxed text-zinc-800 outline-none placeholder:text-zinc-400 dark:text-zinc-100 dark:placeholder:text-zinc-500"
           />
 
-          <div className="flex items-center justify-between px-3 pb-2">
+          <div className="flex items-center justify-between px-2.5 pb-2.5 pt-1">
             <div className="flex items-center gap-0.5">
               <input
                 ref={fileInputRef}
@@ -103,102 +111,85 @@ export function ChatInputBar() {
                 className="hidden"
                 onChange={handleFileChange}
               />
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      className="h-7 w-7"
-                      onClick={() => fileInputRef.current?.click()}
-                    />
-                  }
-                >
-                  <Paperclip className="h-4 w-4" />
-                </TooltipTrigger>
-                <TooltipContent>{t("chat.input.attachFile")}</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      className={cn(
-                        "h-7 w-7",
-                        isWebSearchEnabled && "text-primary bg-primary/10"
-                      )}
-                      onClick={toggleWebSearch}
-                    />
-                  }
-                >
-                  <Globe className="h-4 w-4" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  {isWebSearchEnabled
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className={toolButtonClass()}
+                aria-label={t("chat.input.attachFile")}
+                title={t("chat.input.attachFile")}
+              >
+                <Paperclip className="size-4" />
+              </button>
+              <button
+                onClick={toggleWebSearch}
+                className={toolButtonClass(isWebSearchEnabled)}
+                aria-label={
+                  isWebSearchEnabled
                     ? t("chat.input.webSearchActive")
-                    : t("chat.input.webSearch")}
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      className={cn(
-                        "h-7 w-7",
-                        isReasoningEnabled && "text-primary bg-primary/10"
-                      )}
-                      onClick={toggleReasoning}
-                    />
-                  }
-                >
-                  <Brain className="h-4 w-4" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  {isReasoningEnabled
+                    : t("chat.input.webSearch")
+                }
+                title={
+                  isWebSearchEnabled
+                    ? t("chat.input.webSearchActive")
+                    : t("chat.input.webSearch")
+                }
+              >
+                <Globe className="size-4" />
+              </button>
+              <button
+                onClick={toggleReasoning}
+                className={toolButtonClass(isReasoningEnabled)}
+                aria-label={
+                  isReasoningEnabled
                     ? t("chat.input.deepThinkActive")
-                    : t("chat.input.deepThink")}
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button variant="ghost" size="icon-sm" className="h-7 w-7" />
-                  }
-                >
-                  <Mic className="h-4 w-4" />
-                </TooltipTrigger>
-                <TooltipContent>{t("chat.input.voiceInput")}</TooltipContent>
-              </Tooltip>
+                    : t("chat.input.deepThink")
+                }
+                title={
+                  isReasoningEnabled
+                    ? t("chat.input.deepThinkActive")
+                    : t("chat.input.deepThink")
+                }
+              >
+                <BrainCircuit className="size-4" />
+              </button>
+              <button
+                className={toolButtonClass()}
+                aria-label={t("chat.input.voiceInput")}
+                title={t("chat.input.voiceInput")}
+              >
+                <Mic className="size-4" />
+              </button>
             </div>
 
             {isGenerating ? (
-              <Button
-                size="icon-sm"
-                variant="destructive"
-                className="h-7 w-7"
+              <button
                 onClick={stopGeneration}
+                className="flex h-8.5 items-center gap-1.5 rounded-full bg-zinc-950 px-3.5 text-[12.5px] font-medium text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-95 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+                aria-label={t("chat.input.stop")}
+                title={t("chat.input.stop")}
               >
-                <Square className="h-3.5 w-3.5" />
-              </Button>
+                <Square className="size-3 fill-current" />
+                Stop
+              </button>
             ) : (
-              <Button
-                size="icon-sm"
-                className="h-7 w-7 rounded-full"
-                disabled={!input.trim()}
+              <button
                 onClick={handleSend}
+                disabled={!input.trim()}
+                className={cn(
+                  "flex size-8.5 items-center justify-center rounded-full bg-zinc-950 text-white shadow-sm transition-all duration-150",
+                  "hover:bg-zinc-800 active:scale-95",
+                  "disabled:pointer-events-none disabled:opacity-35",
+                  "dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+                )}
+                aria-label={t("chat.input.send")}
+                title={t("chat.input.send")}
               >
-                <ArrowUp className="h-4 w-4" />
-              </Button>
+                <ArrowUp className="size-4" strokeWidth={2.4} />
+              </button>
             )}
           </div>
         </div>
-        <p className="text-[10px] text-center text-muted-foreground mt-2">
+
+        <p className="mt-2 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
           {t("chat.input.disclaimer")}
         </p>
       </div>

@@ -1,14 +1,13 @@
 import { useTranslation } from "react-i18next"
-import { Settings, Moon, Sun, Monitor } from "lucide-react"
-import { Button } from "#/components/ui/button"
+import { Settings, Sun, Moon, Languages } from "lucide-react"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu"
-import { useTheme } from "@/components/theme-provider"
+  MenuRoot,
+  MenuContent,
+  MenuItem,
+  MenuTrigger,
+  MenuSeparator,
+} from "@/components/ui/menu"
+import { useTheme } from "@/shared/theme-provider"
 import { changeLocale, supportedLocales } from "@/lib/i18n"
 import type { Locale } from "@/lib/i18n"
 
@@ -18,58 +17,50 @@ interface ChatUserFooterProps {
 
 export function ChatUserFooter({ onOpenSettings }: ChatUserFooterProps) {
   const { t, i18n } = useTranslation()
-  const { theme, setTheme } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
   const language = (i18n.resolvedLanguage ?? "en") as Locale
   const nextLanguage = supportedLocales.find((l) => l !== language) ?? "en"
 
-  const themeIcon =
-    theme === "dark" ? (
-      <Moon className="h-4 w-4" />
-    ) : theme === "light" ? (
-      <Sun className="h-4 w-4" />
-    ) : (
-      <Monitor className="h-4 w-4" />
-    )
-
-  const themeLabel =
-    theme === "dark"
-      ? "Dark"
-      : theme === "light"
-        ? "Light"
-        : "System"
-
   return (
-    <div className="flex items-center gap-2 p-2">
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button variant="ghost" className="w-full justify-start gap-2 px-2" />
-          }
-        >
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium">
+    <div className="shrink-0 border-t border-zinc-200 p-2.5 dark:border-zinc-800">
+      <MenuRoot>
+        <MenuTrigger className="flex h-10 w-full items-center gap-2.5 rounded-xl px-2 text-left outline-none transition-colors hover:bg-zinc-100 data-[popup-open]:bg-zinc-100 focus-visible:bg-zinc-100 dark:hover:bg-zinc-800 dark:data-[popup-open]:bg-zinc-800 dark:focus-visible:bg-zinc-800">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 text-[11px] font-bold text-white dark:from-zinc-200 dark:to-zinc-400 dark:text-zinc-900">
             U
           </div>
-          <span className="truncate text-sm">User</span>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56">
-          <DropdownMenuItem onClick={onOpenSettings}>
-            <Settings className="h-4 w-4 mr-2" />
+          <div className="min-w-0 flex-1 leading-tight">
+            <p className="truncate text-[13px] font-medium text-zinc-800 dark:text-zinc-100">
+              User
+            </p>
+            <p className="truncate text-[10px] text-zinc-400 dark:text-zinc-500">
+              User account
+            </p>
+          </div>
+          <Settings className="size-3.5 shrink-0 text-zinc-400" />
+        </MenuTrigger>
+        <MenuContent align="start" sideOffset={6}>
+          <MenuItem onClick={onOpenSettings}>
+            <Settings className="size-3.5" />
             {t("chat.sidebar.settings")}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-            {themeIcon}
-            <span className="ml-2">{themeLabel}</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => changeLocale(nextLanguage)}>
-            <span className="h-4 w-4 mr-2 flex items-center justify-center text-xs font-bold">
-              {nextLanguage.toUpperCase()}
-            </span>
+          </MenuItem>
+          <MenuSeparator />
+          <MenuItem
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+          >
+            {resolvedTheme === "dark" ? (
+              <Sun className="size-3.5" />
+            ) : (
+              <Moon className="size-3.5" />
+            )}
+            {resolvedTheme === "dark" ? "Light" : "Dark"}
+          </MenuItem>
+          <MenuSeparator />
+          <MenuItem onClick={() => changeLocale(nextLanguage)}>
+            <Languages className="size-3.5" />
             {nextLanguage === "id" ? "Bahasa Indonesia" : "English"}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </MenuItem>
+        </MenuContent>
+      </MenuRoot>
     </div>
   )
 }

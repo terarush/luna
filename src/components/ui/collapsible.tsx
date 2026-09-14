@@ -1,21 +1,43 @@
-"use client"
+import { Collapsible as BaseCollapsible } from "@base-ui/react/collapsible"
+import { cn } from "@/lib/utils"
 
-import { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible"
-
-function Collapsible({ ...props }: CollapsiblePrimitive.Root.Props) {
-  return <CollapsiblePrimitive.Root data-slot="collapsible" {...props} />
+function Collapsible({
+  className,
+  ...props
+}: React.ComponentProps<typeof BaseCollapsible.Root>) {
+  return <BaseCollapsible.Root className={className} {...props} />
 }
 
-function CollapsibleTrigger({ ...props }: CollapsiblePrimitive.Trigger.Props) {
+function CollapsibleTrigger({
+  className,
+  ...props
+}: React.ComponentProps<typeof BaseCollapsible.Trigger>) {
   return (
-    <CollapsiblePrimitive.Trigger data-slot="collapsible-trigger" {...props} />
+    <BaseCollapsible.Trigger
+      className={cn("cursor-pointer outline-none", className)}
+      {...props}
+    />
   )
 }
 
-function CollapsibleContent({ ...props }: CollapsiblePrimitive.Panel.Props) {
+function CollapsibleContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof BaseCollapsible.Panel>) {
   return (
-    <CollapsiblePrimitive.Panel data-slot="collapsible-content" {...props} />
+    <BaseCollapsible.Panel
+      className={cn(
+        "grid transition-[grid-template-rows] duration-300 ease-out",
+        "data-[open]:grid-rows-[1fr] data-[closed]:grid-rows-[0fr]",
+        className
+      )}
+      {...props}
+    />
   )
 }
 
-export { Collapsible, CollapsibleTrigger, CollapsibleContent }
+function CollapsibleInner({ className, ...props }: React.ComponentProps<"div">) {
+  return <div className={cn("overflow-hidden", className)} {...props} />
+}
+
+export { Collapsible, CollapsibleTrigger, CollapsibleContent, CollapsibleInner }

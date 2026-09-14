@@ -1,6 +1,4 @@
 import * as React from "react"
-import { SidebarInset, SidebarProvider } from "#/components/ui/sidebar"
-import { TooltipProvider } from "#/components/ui/tooltip"
 import { ChatSidebar } from "./components/sidebar/chat-sidebar"
 import { ChatHeader } from "./components/header/chat-header"
 import { ChatMessagesContainer } from "./components/messages/chat-messages-container"
@@ -12,6 +10,7 @@ import { useChatStore } from "./hooks/use-chat-store"
 export default function ChatPage() {
   const [paramsOpen, setParamsOpen] = React.useState(false)
   const [settingsOpen, setSettingsOpen] = React.useState(false)
+  const [sidebarOpen, setSidebarOpen] = React.useState(true)
   const { sendMessage } = useChatStore()
 
   const handleSendPrompt = React.useCallback(
@@ -22,17 +21,23 @@ export default function ChatPage() {
   )
 
   return (
-    <TooltipProvider>
-      <SidebarProvider>
-        <ChatSidebar onOpenSettings={() => setSettingsOpen(true)} />
-        <SidebarInset className="flex flex-col h-screen">
-          <ChatHeader onOpenParameters={() => setParamsOpen(true)} />
-          <ChatMessagesContainer onSendPrompt={handleSendPrompt} />
-          <ChatInputBar />
-        </SidebarInset>
-        <ChatParametersSheet open={paramsOpen} onOpenChange={setParamsOpen} />
-        <ChatSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
-      </SidebarProvider>
-    </TooltipProvider>
+    <div className="flex h-dvh overflow-hidden">
+      <ChatSidebar
+        open={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onOpenSettings={() => setSettingsOpen(true)}
+      />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <ChatHeader
+          sidebarOpen={sidebarOpen}
+          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          onOpenParameters={() => setParamsOpen(true)}
+        />
+        <ChatMessagesContainer onSendPrompt={handleSendPrompt} />
+        <ChatInputBar />
+      </div>
+      <ChatParametersSheet open={paramsOpen} onOpenChange={setParamsOpen} />
+      <ChatSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+    </div>
   )
 }

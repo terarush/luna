@@ -1,7 +1,6 @@
 import * as React from "react"
-import { Check, Copy } from "lucide-react"
-import { Button } from "#/components/ui/button"
-import { cn } from "@/lib/utils"
+import { useTranslation } from "react-i18next"
+import { Copy, Check, FileCode2 } from "lucide-react"
 
 interface CodeBlockProps {
   language?: string
@@ -9,6 +8,7 @@ interface CodeBlockProps {
 }
 
 export function CodeBlock({ language, children }: CodeBlockProps) {
+  const { t } = useTranslation()
   const [copied, setCopied] = React.useState(false)
 
   const handleCopy = async () => {
@@ -18,28 +18,32 @@ export function CodeBlock({ language, children }: CodeBlockProps) {
   }
 
   return (
-    <div className="group/code relative my-2 rounded-lg border bg-muted text-sm overflow-hidden">
-      <div className="flex items-center justify-between border-b px-3 py-1.5 bg-muted/50">
-        <span className="text-xs font-medium text-muted-foreground">
+    <div className="my-2.5 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 dark:border-zinc-700/60 dark:bg-zinc-900">
+      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-3 py-1.5 dark:border-zinc-700/60 dark:bg-zinc-800/60">
+        <span className="flex items-center gap-1.5 font-mono text-[11px] text-zinc-400 dark:text-zinc-400">
+          <FileCode2 className="size-3" />
           {language ?? "code"}
         </span>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="h-6 w-6"
+        <button
           onClick={handleCopy}
+          className="flex items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 dark:hover:bg-zinc-700 dark:hover:text-zinc-50"
+          aria-label={copied ? t("chat.messages.copied") : t("chat.messages.copyCode")}
         >
           {copied ? (
-            <Check className="h-3.5 w-3.5 text-green-500" />
+            <>
+              <Check className="size-3 text-zinc-100" />
+              <span className="text-zinc-100">{t("chat.messages.copied")}</span>
+            </>
           ) : (
-            <Copy className="h-3.5 w-3.5" />
+            <>
+              <Copy className="size-3" />
+              {t("chat.messages.copyCode")}
+            </>
           )}
-        </Button>
+        </button>
       </div>
-      <pre className="overflow-x-auto p-3">
-        <code className={cn("text-sm", language && `language-${language}`)}>
-          {children}
-        </code>
+      <pre className="overflow-x-auto p-3.5 font-mono text-[12px] leading-relaxed text-zinc-200 dark:text-zinc-300">
+        <code className={language ? `language-${language}` : ""}>{children}</code>
       </pre>
     </div>
   )

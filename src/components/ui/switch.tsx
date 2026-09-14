@@ -1,31 +1,30 @@
-"use client"
-
-import { Switch as SwitchPrimitive } from "@base-ui/react/switch"
-
+import { Switch as BaseSwitch } from "@base-ui/react/switch"
 import { cn } from "@/lib/utils"
 
 function Switch({
   className,
-  size = "default",
   ...props
-}: SwitchPrimitive.Root.Props & {
-  size?: "sm" | "default"
-}) {
+}: React.ComponentProps<typeof BaseSwitch.Root>) {
   return (
-    <SwitchPrimitive.Root
-      data-slot="switch"
-      data-size={size}
+    <BaseSwitch.Root
       className={cn(
-        "peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent transition-all outline-none after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px] dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:bg-primary data-unchecked:bg-input dark:data-unchecked:bg-input/80 data-disabled:cursor-not-allowed data-disabled:opacity-50",
+        "relative inline-flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full bg-zinc-200 outline-none transition-colors duration-200",
+        "hover:bg-zinc-300",
+        "data-[checked]:bg-zinc-950 data-[checked]:hover:bg-zinc-800",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "focus-visible:ring-2 focus-visible:ring-zinc-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950",
+        "dark:bg-zinc-700 dark:data-[checked]:bg-zinc-100 dark:data-[checked]:hover:bg-zinc-200",
         className
       )}
       {...props}
     >
-      <SwitchPrimitive.Thumb
-        data-slot="switch-thumb"
-        className="pointer-events-none block rounded-full bg-background ring-0 transition-transform group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 group-data-[size=default]/switch:data-checked:translate-x-[calc(100%-2px)] group-data-[size=sm]/switch:data-checked:translate-x-[calc(100%-2px)] dark:data-checked:bg-primary-foreground group-data-[size=default]/switch:data-unchecked:translate-x-0 group-data-[size=sm]/switch:data-unchecked:translate-x-0 dark:data-unchecked:bg-foreground"
+      <BaseSwitch.Thumb
+        className={cn(
+          "pointer-events-none block size-5 rounded-full bg-white shadow-sm transition-transform duration-200",
+          "translate-x-[2px] data-[checked]:translate-x-[18px]"
+        )}
       />
-    </SwitchPrimitive.Root>
+    </BaseSwitch.Root>
   )
 }
 

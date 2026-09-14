@@ -1,20 +1,31 @@
 import { useTranslation } from "react-i18next"
-import { Plus, Share2, SlidersHorizontal, Sun, Moon } from "lucide-react"
-import { Button } from "#/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/ui/tooltip"
-import { SidebarTrigger } from "#/components/ui/sidebar"
-import { useTheme } from "@/components/theme-provider"
-import { useChatStore } from "../../hooks/use-chat-store"
-import { ModelSelector } from "./model-selector"
+import { PanelLeft, SlidersHorizontal, Share2, SquarePen, Sun, Moon } from "lucide-react"
 import { toast } from "sonner"
+import {
+  TooltipRoot,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip"
+import { useChatStore } from "../../hooks/use-chat-store"
+import { useTheme } from "@/shared/theme-provider"
+import { ModelSelector } from "./model-selector"
 
 interface ChatHeaderProps {
+  sidebarOpen: boolean
+  onToggleSidebar: () => void
   onOpenParameters: () => void
 }
 
-export function ChatHeader({ onOpenParameters }: ChatHeaderProps) {
+const iconButtonClass =
+  "flex size-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+
+export function ChatHeader({
+  sidebarOpen,
+  onToggleSidebar,
+  onOpenParameters,
+}: ChatHeaderProps) {
   const { t } = useTranslation()
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
   const { createNewSession } = useChatStore()
 
   const handleShare = () => {
@@ -23,59 +34,81 @@ export function ChatHeader({ onOpenParameters }: ChatHeaderProps) {
   }
 
   return (
-    <header className="flex items-center justify-between border-b px-3 py-2">
-      <div className="flex items-center gap-2">
-        <SidebarTrigger />
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white/80 px-3 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/70">
+      <div className="flex items-center gap-1">
+        <TooltipRoot>
+          <TooltipTrigger
+            className={iconButtonClass}
+            onClick={onToggleSidebar}
+            aria-label="Toggle sidebar"
+          >
+            <PanelLeft className="size-4" />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+          </TooltipContent>
+        </TooltipRoot>
         <ModelSelector />
       </div>
-      <div className="flex items-center gap-1">
-        <Tooltip>
-          <TooltipTrigger
-            render={<Button variant="ghost" size="icon-sm" onClick={onOpenParameters} />}
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-          </TooltipTrigger>
-          <TooltipContent>{t("chat.header.parameters")}</TooltipContent>
-        </Tooltip>
 
-        <Tooltip>
+      <div className="flex items-center gap-0.5">
+        <TooltipRoot>
           <TooltipTrigger
-            render={<Button variant="ghost" size="icon-sm" onClick={handleShare} />}
+            className={iconButtonClass}
+            onClick={onOpenParameters}
+            aria-label={t("chat.header.parameters")}
           >
-            <Share2 className="h-4 w-4" />
+            <SlidersHorizontal className="size-4" />
           </TooltipTrigger>
-          <TooltipContent>{t("chat.header.share")}</TooltipContent>
-        </Tooltip>
+          <TooltipContent side="bottom">
+            {t("chat.header.parameters")}
+          </TooltipContent>
+        </TooltipRoot>
 
-        <Tooltip>
+        <TooltipRoot>
           <TooltipTrigger
-            render={
-              <Button variant="ghost" size="icon-sm" onClick={() => createNewSession()} />
-            }
+            className={iconButtonClass}
+            onClick={handleShare}
+            aria-label={t("chat.header.share")}
           >
-            <Plus className="h-4 w-4" />
+            <Share2 className="size-4" />
           </TooltipTrigger>
-          <TooltipContent>{t("chat.header.newChatTooltip")}</TooltipContent>
-        </Tooltip>
+          <TooltipContent side="bottom">
+            {t("chat.header.share")}
+          </TooltipContent>
+        </TooltipRoot>
 
-        <Tooltip>
+        <TooltipRoot>
           <TooltipTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              />
-            }
+            className={iconButtonClass}
+            onClick={() => createNewSession()}
+            aria-label={t("chat.header.newChatTooltip")}
           >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
+            <SquarePen className="size-4" />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {t("chat.header.newChatTooltip")}
+          </TooltipContent>
+        </TooltipRoot>
+
+        <div className="mx-1.5 h-5 w-px bg-zinc-200 dark:bg-zinc-800" />
+
+        <TooltipRoot>
+          <TooltipTrigger
+            className={iconButtonClass}
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            aria-label={t("chat.settings.theme")}
+          >
+            {resolvedTheme === "dark" ? (
+              <Sun className="size-4" />
             ) : (
-              <Moon className="h-4 w-4" />
+              <Moon className="size-4" />
             )}
           </TooltipTrigger>
-          <TooltipContent>{t("chat.settings.theme")}</TooltipContent>
-        </Tooltip>
+          <TooltipContent side="bottom">
+            {t("chat.settings.theme")}
+          </TooltipContent>
+        </TooltipRoot>
       </div>
     </header>
   )
