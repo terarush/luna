@@ -1,5 +1,5 @@
 import { createRootRoute, createRoute, Outlet } from "@tanstack/react-router"
-import { ThemeProvider } from "@/shared/theme-provider"
+import { MuiThemeProvider } from "@/shared/themes/mui-theme-provider"
 import ChatPage from "@/modules/chat/index"
 import NotFound from "@/modules/error/not-found"
 
@@ -14,8 +14,8 @@ export const rootRoute = createRootRoute({
 
 function RootComponent() {
   return (
-    <ThemeProvider>
-      <div className="min-h-dvh bg-zinc-50 font-sans text-zinc-950 antialiased selection:bg-sky-500/20 dark:bg-zinc-950 dark:text-zinc-50">
+    <MuiThemeProvider>
+      <div className="font-sans antialiased">
         <Outlet />
         <Toaster
           position="top-center"
@@ -28,7 +28,7 @@ function RootComponent() {
           }}
         />
       </div>
-    </ThemeProvider>
+    </MuiThemeProvider>
   )
 }
 
