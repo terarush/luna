@@ -27,18 +27,20 @@ export function ModelSelector() {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" className="gap-1.5 px-2 h-8">
-          <span className="text-sm font-medium truncate max-w-[140px]">
-            {currentModel?.name ?? selectedModel}
+      <PopoverTrigger
+        render={
+          <Button variant="ghost" className="gap-1.5 px-2 h-8" />
+        }
+      >
+        <span className="text-sm font-medium truncate max-w-[140px]">
+          {currentModel?.name ?? selectedModel}
+        </span>
+        {currentModel && (
+          <span className="text-[10px] font-medium text-muted-foreground bg-muted rounded px-1 py-0.5">
+            {currentModel.tag}
           </span>
-          {currentModel && (
-            <span className="text-[10px] font-medium text-muted-foreground bg-muted rounded px-1 py-0.5">
-              {currentModel.tag}
-            </span>
-          )}
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-        </Button>
+        )}
+        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       </PopoverTrigger>
       <PopoverContent align="start" className="w-[320px] p-0">
         <Command>

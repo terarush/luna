@@ -30,45 +30,49 @@ export function ChatHeader({ onOpenParameters }: ChatHeaderProps) {
       </div>
       <div className="flex items-center gap-1">
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon-sm" onClick={onOpenParameters}>
-              <SlidersHorizontal className="h-4 w-4" />
-            </Button>
+          <TooltipTrigger
+            render={<Button variant="ghost" size="icon-sm" onClick={onOpenParameters} />}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
           </TooltipTrigger>
           <TooltipContent>{t("chat.header.parameters")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon-sm" onClick={handleShare}>
-              <Share2 className="h-4 w-4" />
-            </Button>
+          <TooltipTrigger
+            render={<Button variant="ghost" size="icon-sm" onClick={handleShare} />}
+          >
+            <Share2 className="h-4 w-4" />
           </TooltipTrigger>
           <TooltipContent>{t("chat.header.share")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon-sm" onClick={() => createNewSession()}>
-              <Plus className="h-4 w-4" />
-            </Button>
+          <TooltipTrigger
+            render={
+              <Button variant="ghost" size="icon-sm" onClick={() => createNewSession()} />
+            }
+          >
+            <Plus className="h-4 w-4" />
           </TooltipTrigger>
           <TooltipContent>{t("chat.header.newChatTooltip")}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </Button>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              />
+            }
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </TooltipTrigger>
           <TooltipContent>{t("chat.settings.theme")}</TooltipContent>
         </Tooltip>

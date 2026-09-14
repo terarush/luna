@@ -104,32 +104,36 @@ export function ChatInputBar() {
                 onChange={handleFileChange}
               />
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="h-7 w-7"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className="h-7 w-7"
+                      onClick={() => fileInputRef.current?.click()}
+                    />
+                  }
+                >
+                  <Paperclip className="h-4 w-4" />
                 </TooltipTrigger>
                 <TooltipContent>{t("chat.input.attachFile")}</TooltipContent>
               </Tooltip>
 
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className={cn(
-                      "h-7 w-7",
-                      isWebSearchEnabled && "text-primary bg-primary/10"
-                    )}
-                    onClick={toggleWebSearch}
-                  >
-                    <Globe className="h-4 w-4" />
-                  </Button>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className={cn(
+                        "h-7 w-7",
+                        isWebSearchEnabled && "text-primary bg-primary/10"
+                      )}
+                      onClick={toggleWebSearch}
+                    />
+                  }
+                >
+                  <Globe className="h-4 w-4" />
                 </TooltipTrigger>
                 <TooltipContent>
                   {isWebSearchEnabled
@@ -139,18 +143,20 @@ export function ChatInputBar() {
               </Tooltip>
 
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className={cn(
-                      "h-7 w-7",
-                      isReasoningEnabled && "text-primary bg-primary/10"
-                    )}
-                    onClick={toggleReasoning}
-                  >
-                    <Brain className="h-4 w-4" />
-                  </Button>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className={cn(
+                        "h-7 w-7",
+                        isReasoningEnabled && "text-primary bg-primary/10"
+                      )}
+                      onClick={toggleReasoning}
+                    />
+                  }
+                >
+                  <Brain className="h-4 w-4" />
                 </TooltipTrigger>
                 <TooltipContent>
                   {isReasoningEnabled
@@ -160,10 +166,12 @@ export function ChatInputBar() {
               </Tooltip>
 
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" className="h-7 w-7">
-                    <Mic className="h-4 w-4" />
-                  </Button>
+                <TooltipTrigger
+                  render={
+                    <Button variant="ghost" size="icon-sm" className="h-7 w-7" />
+                  }
+                >
+                  <Mic className="h-4 w-4" />
                 </TooltipTrigger>
                 <TooltipContent>{t("chat.input.voiceInput")}</TooltipContent>
               </Tooltip>

@@ -4,12 +4,9 @@ import { useTranslation } from "react-i18next"
 import { useTheme } from "@/components/theme-provider"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { getSeoMeta } from "@/meta"
-import { Button } from "#/components/ui/button"
-import { useNavigate } from "@tanstack/react-router"
 
 export default function HomePage() {
   const { theme, setTheme } = useTheme()
-  const navigate = useNavigate()
   const { t } = useTranslation()
   const seo = getSeoMeta()
 
@@ -17,12 +14,8 @@ export default function HomePage() {
     setTheme(theme === "dark" ? "light" : "dark")
   }
 
-  const handleGetStarted = () => {
-    navigate({ to: "/get-started" })
-  }
-
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-6 transition-colors duration-200 relative">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-6 transition-colors duration-200 relative isolate">
       <Helmet>
         <title>{seo.title}</title>
         <meta name="description" content={seo.description} />
@@ -60,9 +53,9 @@ export default function HomePage() {
             {t("home.description")}
           </p>
         </div>
-        <Button variant="default" onClick={handleGetStarted}>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {t("home.getStarted")}
-        </Button>
+        </p>
       </div>
     </div>
   )

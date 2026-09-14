@@ -41,13 +41,15 @@ export function ChatUserFooter({ onOpenSettings }: ChatUserFooterProps) {
   return (
     <div className="flex items-center gap-2 p-2">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="w-full justify-start gap-2 px-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium">
-              U
-            </div>
-            <span className="truncate text-sm">User</span>
-          </Button>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" className="w-full justify-start gap-2 px-2" />
+          }
+        >
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium">
+            U
+          </div>
+          <span className="truncate text-sm">User</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-56">
           <DropdownMenuItem onClick={onOpenSettings}>

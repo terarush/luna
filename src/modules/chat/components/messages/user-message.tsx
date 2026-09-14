@@ -1,4 +1,3 @@
-import * as React from "react"
 import { useTranslation } from "react-i18next"
 import { Copy, Pencil, FileText, Image } from "lucide-react"
 import { Button } from "#/components/ui/button"
@@ -11,13 +10,9 @@ interface UserMessageProps {
 
 export function UserMessage({ message }: UserMessageProps) {
   const { t } = useTranslation()
-  const [copied, setCopied] = React.useState(false)
-
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content)
-    setCopied(true)
     toast.success(t("chat.messages.copySuccess"))
-    setTimeout(() => setCopied(false), 2000)
   }
 
   return (

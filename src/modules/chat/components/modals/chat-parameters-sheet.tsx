@@ -79,7 +79,7 @@ export function ChatParametersSheet({ open, onOpenChange }: ChatParametersSheetP
             </p>
             <Slider
               value={[local.temperature]}
-              onValueChange={([v]) => setLocal({ ...local, temperature: v })}
+              onValueChange={(v) => setLocal({ ...local, temperature: Array.isArray(v) ? v[0] : v })}
               min={0}
               max={2}
               step={0.05}
@@ -95,7 +95,7 @@ export function ChatParametersSheet({ open, onOpenChange }: ChatParametersSheetP
             </div>
             <Slider
               value={[local.contextLength]}
-              onValueChange={([v]) => setLocal({ ...local, contextLength: v })}
+              onValueChange={(v) => setLocal({ ...local, contextLength: Array.isArray(v) ? v[0] : v })}
               min={2048}
               max={131072}
               step={1024}
@@ -111,7 +111,7 @@ export function ChatParametersSheet({ open, onOpenChange }: ChatParametersSheetP
             </div>
             <Slider
               value={[local.topP]}
-              onValueChange={([v]) => setLocal({ ...local, topP: v })}
+              onValueChange={(v) => setLocal({ ...local, topP: Array.isArray(v) ? v[0] : v })}
               min={0}
               max={1}
               step={0.05}

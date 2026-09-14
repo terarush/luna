@@ -1,10 +1,8 @@
-import { useTranslation } from "react-i18next"
 import { X, FileText, Image } from "lucide-react"
 import { Button } from "#/components/ui/button"
 import { useChatStore } from "../../hooks/use-chat-store"
 
 export function ChatAttachmentPreview() {
-  const { t } = useTranslation()
   const { pendingAttachments, removeAttachment } = useChatStore()
 
   if (pendingAttachments.length === 0) return null
