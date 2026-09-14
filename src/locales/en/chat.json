@@ -1,0 +1,90 @@
+{
+  "chat": {
+    "sidebar": {
+      "newChat": "New Chat",
+      "searchPlaceholder": "Search chats...",
+      "pinned": "Pinned",
+      "recent": "Recent Chats",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "previous7Days": "Previous 7 Days",
+      "rename": "Rename",
+      "pin": "Pin Chat",
+      "unpin": "Unpin Chat",
+      "delete": "Delete Chat",
+      "deleteConfirm": "Are you sure you want to delete this conversation?",
+      "settings": "Settings",
+      "userProfile": "User Profile"
+    },
+    "header": {
+      "selectModel": "Select Model",
+      "searchModel": "Search models...",
+      "noModelFound": "No model found.",
+      "parameters": "Parameters",
+      "share": "Share",
+      "newChatTooltip": "New chat (Ctrl+K)"
+    },
+    "emptyState": {
+      "title": "How can I help you today?",
+      "subtitle": "Select a prompt below or type your own question to start chatting with",
+      "prompt1Title": "Explain Code Architecture",
+      "prompt1Desc": "Analyze trade-offs between monorepo and polyrepo architectures",
+      "prompt2Title": "Write a TypeScript Helper",
+      "prompt2Desc": "Create a type-safe debounce utility with cancel support",
+      "prompt3Title": "Deep Reasoning",
+      "prompt3Desc": "Solve a step-by-step logic puzzle with full explanations",
+      "prompt4Title": "Brainstorm Features",
+      "prompt4Desc": "Generate 5 innovative AI features for productivity apps"
+    },
+    "messages": {
+      "thoughtTitle": "Thinking Process",
+      "thoughtDuration": "thought for {{seconds}}s",
+      "copySuccess": "Copied to clipboard",
+      "copyCode": "Copy code",
+      "copied": "Copied!",
+      "regenerate": "Regenerate",
+      "goodResponse": "Good response",
+      "badResponse": "Bad response",
+      "readAloud": "Read aloud",
+      "tokensPerSec": "{{rate}} tokens/s",
+      "totalTokens": "{{count}} tokens"
+    },
+    "input": {
+      "placeholder": "Send a message... (Shift+Enter for newline)",
+      "attachFile": "Attach files",
+      "webSearch": "Web Search",
+      "webSearchActive": "Web Search Enabled",
+      "deepThink": "Reasoning",
+      "deepThinkActive": "Deep Reasoning Enabled",
+      "voiceInput": "Voice Input",
+      "send": "Send Message",
+      "stop": "Stop generating",
+      "disclaimer": "AI can make mistakes. Verify important information."
+    },
+    "parameters": {
+      "title": "Model Controls",
+      "description": "Fine-tune generation parameters for the current session.",
+      "systemPrompt": "System Prompt",
+      "systemPromptDesc": "Direct how the model behaves and responds.",
+      "temperature": "Temperature",
+      "temperatureDesc": "Higher values make output more random, lower values more deterministic.",
+      "contextLength": "Context Length",
+      "topP": "Top P",
+      "reset": "Reset to Default",
+      "apply": "Save Changes"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Manage your Open WebUI interface, models, and preferences.",
+      "tabGeneral": "General",
+      "tabModels": "Models",
+      "tabInterface": "Interface",
+      "tabAudio": "Audio",
+      "theme": "Theme",
+      "language": "Language",
+      "enterToSend": "Press Enter to send",
+      "streamingSpeed": "Streaming Speed",
+      "close": "Close"
+    }
+  }
+}

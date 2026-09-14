@@ -1,0 +1,90 @@
+{
+  "chat": {
+    "sidebar": {
+      "newChat": "Obrolan Baru",
+      "searchPlaceholder": "Cari obrolan...",
+      "pinned": "Disematkan",
+      "recent": "Obrolan Terkini",
+      "today": "Hari ini",
+      "yesterday": "Kemarin",
+      "previous7Days": "7 Hari Terakhir",
+      "rename": "Ubah Nama",
+      "pin": "Sematkan Obrolan",
+      "unpin": "Lepas Sematan",
+      "delete": "Hapus Obrolan",
+      "deleteConfirm": "Apakah Anda yakin ingin menghapus percakapan ini?",
+      "settings": "Pengaturan",
+      "userProfile": "Profil Pengguna"
+    },
+    "header": {
+      "selectModel": "Pilih Model",
+      "searchModel": "Cari model...",
+      "noModelFound": "Model tidak ditemukan.",
+      "parameters": "Parameter",
+      "share": "Bagikan",
+      "newChatTooltip": "Obrolan baru (Ctrl+K)"
+    },
+    "emptyState": {
+      "title": "Apa yang bisa saya bantu hari ini?",
+      "subtitle": "Pilih salah satu prompt di bawah atau ketik pertanyaan Anda untuk memulai dengan",
+      "prompt1Title": "Jelaskan Arsitektur Kode",
+      "prompt1Desc": "Analisis perbandingan arsitektur monorepo dan polyrepo",
+      "prompt2Title": "Buat Helper TypeScript",
+      "prompt2Desc": "Buat utilitas debounce type-safe dengan dukungan pembatalan",
+      "prompt3Title": "Penalaran Mendalam",
+      "prompt3Desc": "Pecahkan teka-teki logika langkah demi langkah dengan penjelasan",
+      "prompt4Title": "Brainstorm Ide Fitur",
+      "prompt4Desc": "Hasilkan 5 ide fitur AI inovatif untuk aplikasi produktivitas"
+    },
+    "messages": {
+      "thoughtTitle": "Proses Berpikir",
+      "thoughtDuration": "berpikir selama {{seconds}} dtk",
+      "copySuccess": "Disalin ke papan klip",
+      "copyCode": "Salin kode",
+      "copied": "Tersalin!",
+      "regenerate": "Hasilkan Ulang",
+      "goodResponse": "Jawaban memuaskan",
+      "badResponse": "Jawaban kurang baik",
+      "readAloud": "Bacakan",
+      "tokensPerSec": "{{rate}} token/dtk",
+      "totalTokens": "{{count}} token"
+    },
+    "input": {
+      "placeholder": "Kirim pesan... (Shift+Enter untuk baris baru)",
+      "attachFile": "Lampirkan berkas",
+      "webSearch": "Pencarian Web",
+      "webSearchActive": "Pencarian Web Aktif",
+      "deepThink": "Penalaran",
+      "deepThinkActive": "Penalaran Mendalam Aktif",
+      "voiceInput": "Input Suara",
+      "send": "Kirim Pesan",
+      "stop": "Hentikan pembuatan",
+      "disclaimer": "AI dapat membuat kesalahan. Harap verifikasi informasi penting."
+    },
+    "parameters": {
+      "title": "Kontrol Model",
+      "description": "Sesuaikan parameter generasi untuk sesi ini.",
+      "systemPrompt": "System Prompt",
+      "systemPromptDesc": "Atur cara model bertindak dan merespons instruksi.",
+      "temperature": "Temperatur",
+      "temperatureDesc": "Nilai lebih tinggi membuat respon lebih kreatif, lebih rendah lebih terarah.",
+      "contextLength": "Panjang Konteks",
+      "topP": "Top P",
+      "reset": "Kembalikan ke Awal",
+      "apply": "Simpan Perubahan"
+    },
+    "settings": {
+      "title": "Pengaturan",
+      "description": "Kelola antarmuka Open WebUI, model, dan preferensi Anda.",
+      "tabGeneral": "Umum",
+      "tabModels": "Model",
+      "tabInterface": "Tampilan",
+      "tabAudio": "Audio",
+      "theme": "Tema",
+      "language": "Bahasa",
+      "enterToSend": "Tekan Enter untuk mengirim",
+      "streamingSpeed": "Kecepatan Streaming",
+      "close": "Tutup"
+    }
+  }
+}
