@@ -1,13 +1,9 @@
 import { useTranslation } from "react-i18next"
-import { PanelLeft, SlidersHorizontal, Share2, SquarePen, Sun, Moon } from "lucide-react"
+import { Box, IconButton, Tooltip, Divider, Typography } from "@mui/material"
+import { PanelLeft, SlidersHorizontal, Share2, SquarePen, Sun, Moon, MessageSquareText } from "lucide-react"
 import { toast } from "sonner"
-import {
-  TooltipRoot,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip"
 import { useChatStore } from "../../hooks/use-chat-store"
-import { useTheme } from "@/shared/theme-provider"
+import { useMuiTheme } from "@/shared/themes/mui-theme-provider"
 import { ModelSelector } from "./model-selector"
 
 interface ChatHeaderProps {
@@ -16,16 +12,9 @@ interface ChatHeaderProps {
   onOpenParameters: () => void
 }
 
-const iconButtonClass =
-  "flex size-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-
-export function ChatHeader({
-  sidebarOpen,
-  onToggleSidebar,
-  onOpenParameters,
-}: ChatHeaderProps) {
+export function ChatHeader({ sidebarOpen, onToggleSidebar, onOpenParameters }: ChatHeaderProps) {
   const { t } = useTranslation()
-  const { resolvedTheme, setTheme } = useTheme()
+  const { setMode, resolvedMode } = useMuiTheme()
   const { createNewSession } = useChatStore()
 
   const handleShare = () => {
@@ -33,83 +22,95 @@ export function ChatHeader({
     toast.success(t("chat.messages.copySuccess"))
   }
 
+  const actionButtonSx = {
+    color: "text.secondary",
+    transition: "all 0.15s ease",
+    "&:hover": { bgcolor: "action.hover", color: "text.primary" },
+  } as const
+
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white/80 px-3 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/70">
-      <div className="flex items-center gap-1">
-        <TooltipRoot>
-          <TooltipTrigger
-            className={iconButtonClass}
-            onClick={onToggleSidebar}
-            aria-label="Toggle sidebar"
+    <Box
+      component="header"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderBottom: "1px solid",
+        borderColor: "divider",
+        px: { xs: 1, sm: 1.5 },
+        minHeight: { xs: 52, sm: 56 },
+        flexShrink: 0,
+        bgcolor: "background.paper",
+        gap: 1,
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, minWidth: 0 }}>
+        <Tooltip title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}>
+          <IconButton size="small" onClick={onToggleSidebar} sx={actionButtonSx}>
+            <PanelLeft size={17} />
+          </IconButton>
+        </Tooltip>
+
+        {/* Brand shown on mobile when sidebar is hidden */}
+        {!sidebarOpen && (
+          <Box
+            sx={{
+              display: { xs: "flex", sm: "none" },
+              alignItems: "center",
+              gap: 1,
+              ml: 0.5,
+            }}
           >
-            <PanelLeft className="size-4" />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            {sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-          </TooltipContent>
-        </TooltipRoot>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 26,
+                height: 26,
+                borderRadius: 2,
+                bgcolor: "primary.main",
+                color: "primary.contrastText",
+              }}
+            >
+              <MessageSquareText size={14} strokeWidth={2.2} />
+            </Box>
+            <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, letterSpacing: "-0.01em" }}>
+              Luna
+            </Typography>
+          </Box>
+        )}
+
         <ModelSelector />
-      </div>
+      </Box>
 
-      <div className="flex items-center gap-0.5">
-        <TooltipRoot>
-          <TooltipTrigger
-            className={iconButtonClass}
-            onClick={onOpenParameters}
-            aria-label={t("chat.header.parameters")}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.25, flexShrink: 0 }}>
+        <Tooltip title={t("chat.header.parameters")}>
+          <IconButton size="small" onClick={onOpenParameters} sx={actionButtonSx}>
+            <SlidersHorizontal size={17} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("chat.header.share")}>
+          <IconButton size="small" onClick={handleShare} sx={{ ...actionButtonSx, display: { xs: "none", sm: "flex" } }}>
+            <Share2 size={17} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("chat.header.newChatTooltip")}>
+          <IconButton size="small" onClick={() => createNewSession()} sx={actionButtonSx}>
+            <SquarePen size={17} />
+          </IconButton>
+        </Tooltip>
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.75 }} />
+        <Tooltip title={t("chat.settings.theme")}>
+          <IconButton
+            size="small"
+            onClick={() => setMode(resolvedMode === "dark" ? "light" : "dark")}
+            sx={actionButtonSx}
           >
-            <SlidersHorizontal className="size-4" />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            {t("chat.header.parameters")}
-          </TooltipContent>
-        </TooltipRoot>
-
-        <TooltipRoot>
-          <TooltipTrigger
-            className={iconButtonClass}
-            onClick={handleShare}
-            aria-label={t("chat.header.share")}
-          >
-            <Share2 className="size-4" />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            {t("chat.header.share")}
-          </TooltipContent>
-        </TooltipRoot>
-
-        <TooltipRoot>
-          <TooltipTrigger
-            className={iconButtonClass}
-            onClick={() => createNewSession()}
-            aria-label={t("chat.header.newChatTooltip")}
-          >
-            <SquarePen className="size-4" />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            {t("chat.header.newChatTooltip")}
-          </TooltipContent>
-        </TooltipRoot>
-
-        <div className="mx-1.5 h-5 w-px bg-zinc-200 dark:bg-zinc-800" />
-
-        <TooltipRoot>
-          <TooltipTrigger
-            className={iconButtonClass}
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            aria-label={t("chat.settings.theme")}
-          >
-            {resolvedTheme === "dark" ? (
-              <Sun className="size-4" />
-            ) : (
-              <Moon className="size-4" />
-            )}
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            {t("chat.settings.theme")}
-          </TooltipContent>
-        </TooltipRoot>
-      </div>
-    </header>
+            {resolvedMode === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+          </IconButton>
+        </Tooltip>
+      </Box>
+    </Box>
   )
 }

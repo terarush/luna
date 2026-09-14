@@ -1,13 +1,13 @@
 import * as React from "react"
 import { useTranslation } from "react-i18next"
+import { Box, Typography, Popover, List, ListItemButton, ListItemText, TextField, InputAdornment } from "@mui/material"
 import { Check, ChevronDown, Search, Sparkles } from "lucide-react"
-import { Popover } from "@base-ui/react/popover"
 import { useChatStore, AVAILABLE_MODELS } from "../../hooks/use-chat-store"
-import { cn } from "@/lib/utils"
 
 export function ModelSelector() {
   const { t } = useTranslation()
   const { selectedModel, setSelectedModel } = useChatStore()
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [search, setSearch] = React.useState("")
 
   const currentModel = AVAILABLE_MODELS.find((m) => m.id === selectedModel)
@@ -21,75 +21,108 @@ export function ModelSelector() {
   }, [search])
 
   return (
-    <Popover.Root>
-      <Popover.Trigger
-        className="flex h-8 items-center gap-2 rounded-lg px-2.5 text-left outline-none transition-colors hover:bg-zinc-100 focus-visible:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800"
-        aria-label={t("chat.header.selectModel")}
+    <>
+      <Box
+        component="button"
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          height: 32,
+          px: 1.5,
+          borderRadius: 1.5,
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+          transition: "background-color 0.15s ease",
+          "&:hover": { bgcolor: "action.hover" },
+          "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 1 },
+        }}
       >
-        <span className="flex size-4 items-center justify-center">
-          <Sparkles className="size-3.5 text-zinc-500 dark:text-zinc-300" />
-        </span>
-        <span className="max-w-[10rem] truncate text-[13px] font-medium text-zinc-800 dark:text-zinc-100">
+        <Sparkles size={14} style={{ color: "inherit", opacity: 0.8 }} />
+        <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500, maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {currentModel?.name ?? selectedModel}
-        </span>
-        <span className="rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-px text-[10px] font-medium text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+        </Typography>
+        <Box
+          sx={{
+            fontSize: "0.625rem",
+            fontWeight: 500,
+            px: 0.75,
+            py: 0.25,
+            borderRadius: 1,
+            border: "1px solid",
+            borderColor: "divider",
+            color: "text.secondary",
+            whiteSpace: "nowrap",
+          }}
+        >
           {currentModel?.tag}
-        </span>
-        <ChevronDown className="size-3.5 text-zinc-400 transition-transform data-[open]:rotate-180" />
-      </Popover.Trigger>
+        </Box>
+        <ChevronDown size={14} style={{ opacity: 0.5 }} />
+      </Box>
 
-      <Popover.Portal>
-        <Popover.Positioner align="start" sideOffset={6}>
-          <Popover.Popup className="z-50 w-80 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl shadow-zinc-950/8 data-[starting-style]:animate-scale-in dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40">
-            <div className="relative mb-1.5">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-zinc-400" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t("chat.header.searchModel")}
-                className="h-8 w-full rounded-lg border border-zinc-200 bg-zinc-50 pl-8 pr-2 text-xs text-zinc-800 placeholder:text-zinc-400 outline-none transition-colors focus:border-zinc-400 focus:bg-white focus:ring-2 focus:ring-zinc-400/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-500"
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={() => {
+          setAnchorEl(null)
+          setSearch("")
+        }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        slotProps={{ paper: { sx: { width: 320, mt: 0.75, borderRadius: 3, border: "1px solid", borderColor: "divider", boxShadow: "0 12px 32px rgba(9,9,11,0.1)", p: 0.75 } } }}
+      >
+        <TextField
+          fullWidth
+          size="small"
+          placeholder={t("chat.header.searchModel")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search size={14} style={{ opacity: 0.6 }} />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+        <List dense disablePadding sx={{ maxHeight: 288, overflowY: "auto", pt: 0.5 }}>
+          {filteredModels.map((model) => (
+            <ListItemButton
+              key={model.id}
+              selected={model.id === selectedModel}
+              onClick={() => {
+                setSelectedModel(model.id)
+                setAnchorEl(null)
+                setSearch("")
+              }}
+              sx={{ py: 1, borderRadius: 1.5, mx: 0.25 }}
+            >
+              <ListItemText
+                primary={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500 }}>{model.name}</Typography>
+                  </Box>
+                }
+                secondary={model.description}
+                slotProps={{
+                  secondary: { sx: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } },
+                }}
               />
-            </div>
-
-            <div className="max-h-72 overflow-y-auto pb-1">
-              {filteredModels.map((model) => (
-                <button
-                  key={model.id}
-                  onClick={() => {
-                    setSelectedModel(model.id)
-                    setSearch("")
-                  }}
-                  className={cn(
-                    "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left outline-none transition-colors",
-                    "hover:bg-zinc-100 focus-visible:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800",
-                    model.id === selectedModel && "bg-zinc-100 dark:bg-zinc-800"
-                  )}
-                >
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-medium text-zinc-800 dark:text-zinc-100">
-                      {model.name}
-                    </span>
-                    <span className="block truncate text-[11px] text-zinc-500 dark:text-zinc-400">
-                      {model.description}
-                    </span>
-                  </span>
-                  <span className="shrink-0 rounded-md border border-zinc-200 px-1.5 py-px text-[10px] font-medium text-zinc-500 dark:border-zinc-700 dark:text-zinc-300">
-                    {model.tag}
-                  </span>
-                  {model.id === selectedModel && (
-                    <Check className="size-4 shrink-0 text-zinc-800 dark:text-zinc-100" />
-                  )}
-                </button>
-              ))}
-              {filteredModels.length === 0 && (
-                <p className="px-2.5 py-6 text-center text-xs text-zinc-400 dark:text-zinc-500">
-                  {t("chat.header.noModelFound")}
-                </p>
+              {model.id === selectedModel && (
+                <Check size={15} style={{ marginLeft: 8, flexShrink: 0 }} />
               )}
-            </div>
-          </Popover.Popup>
-        </Popover.Positioner>
-      </Popover.Portal>
-    </Popover.Root>
+            </ListItemButton>
+          ))}
+          {filteredModels.length === 0 && (
+            <Typography variant="body2" sx={{ color: "text.disabled", textAlign: "center", py: 4 }}>
+              {t("chat.header.noModelFound")}
+            </Typography>
+          )}
+        </List>
+      </Popover>
+    </>
   )
 }

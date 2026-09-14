@@ -1,16 +1,9 @@
 import * as React from "react"
 import { useTranslation } from "react-i18next"
-import {
-  ArrowUp,
-  Square,
-  Paperclip,
-  Globe,
-  BrainCircuit,
-  Mic,
-} from "lucide-react"
+import { Box, TextField, IconButton, Paper, Tooltip, Typography } from "@mui/material"
+import { ArrowUp, Square, Paperclip, Globe, BrainCircuit, Mic } from "lucide-react"
 import { useChatStore } from "../../hooks/use-chat-store"
 import { ChatAttachmentPreview } from "./chat-attachment-preview"
-import { cn } from "@/lib/utils"
 
 export function ChatInputBar() {
   const { t } = useTranslation()
@@ -26,18 +19,16 @@ export function ChatInputBar() {
   } = useChatStore()
 
   const [input, setInput] = React.useState("")
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
 
   const handleSend = React.useCallback(() => {
     if (!input.trim()) return
     sendMessage(input)
     setInput("")
-    if (textareaRef.current) textareaRef.current.style.height = "auto"
   }, [input, sendMessage])
 
   const handleKeyDown = React.useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault()
         handleSend()
@@ -45,13 +36,6 @@ export function ChatInputBar() {
     },
     [handleSend]
   )
-
-  const handleInput = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value)
-    const ta = e.target
-    ta.style.height = "auto"
-    ta.style.height = Math.min(ta.scrollHeight, 200) + "px"
-  }, [])
 
   const handleFileChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,128 +55,175 @@ export function ChatInputBar() {
     [addAttachment]
   )
 
-  const toolButtonClass = (active = false) =>
-    cn(
-      "flex size-8 shrink-0 items-center justify-center rounded-lg outline-none transition-all duration-150",
-      active
-        ? "bg-zinc-950 text-white shadow-sm hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
-        : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200",
-      "focus-visible:ring-2 focus-visible:ring-zinc-400/50"
-    )
+  const toolButtonSx = (active = false) => ({
+    width: 32,
+    height: 32,
+    borderRadius: 1.5,
+    color: active ? "primary.contrastText" : "text.disabled",
+    bgcolor: active ? "primary.main" : "transparent",
+    transition: "all 0.15s ease",
+    "&:hover": {
+      bgcolor: active ? "primary.dark" : "action.hover",
+      color: active ? "primary.contrastText" : "text.primary",
+    },
+    "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 1 },
+  })
+
+  const sendButtonSx = {
+    width: 34,
+    height: 34,
+    borderRadius: "50%",
+    bgcolor: "primary.main",
+    color: "primary.contrastText",
+    border: "none",
+    cursor: "pointer",
+    transition: "all 0.15s ease",
+    "&:hover": { bgcolor: "primary.dark" },
+    "&:active": { transform: "scale(0.92)" },
+    "&:disabled": { opacity: 0.35, pointerEvents: "none" },
+    "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 1 },
+  }
 
   return (
-    <div className="shrink-0 border-t border-zinc-200/70 bg-gradient-to-b from-transparent to-zinc-100/60 px-3 pb-3 pt-2 dark:border-zinc-800/70 dark:to-zinc-950/40 sm:px-4">
-      <div className="mx-auto max-w-3xl">
-        <div
-          className={cn(
-            "overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg shadow-zinc-950/4 transition-all duration-200",
-            "focus-within:border-zinc-300 focus-within:shadow-zinc-950/8 focus-within:ring-4 focus-within:ring-zinc-500/10",
-            "dark:border-zinc-700 dark:bg-zinc-900 dark:focus-within:border-zinc-600"
-          )}
+    <Box
+      sx={{
+        flexShrink: 0,
+        borderTop: "1px solid",
+        borderColor: "divider",
+        background: "transparent",
+        px: { xs: 1, sm: 2 },
+        pb: { xs: 1, sm: 1.5 },
+        pt: { xs: 0.75, sm: 1 },
+      }}
+    >
+      <Box sx={{ mx: "auto", maxWidth: { xs: "100%", md: 768 } }}>
+        <Paper
+          elevation={0}
+          variant="outlined"
+          sx={{
+            borderRadius: { xs: 2.5, sm: 2 },
+            borderColor: "divider",
+            bgcolor: "background.paper",
+            overflow: "hidden",
+            transition: "all 0.2s ease",
+            boxShadow: "none",
+            "&:focus-within": {
+              borderColor: "text.disabled",
+              boxShadow: "none",
+            },
+          }}
         >
           <ChatAttachmentPreview />
 
-          <textarea
-            ref={textareaRef}
+          <TextField
+            fullWidth
+            multiline
+            minRows={1}
+            maxRows={6}
+            variant="standard"
             value={input}
-            onChange={handleInput}
+            onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t("chat.input.placeholder")}
-            rows={1}
-            className="block max-h-[200px] w-full resize-none bg-transparent px-4 pb-0.5 pt-3.5 text-[14px] leading-relaxed text-zinc-800 outline-none placeholder:text-zinc-400 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+            slotProps={{
+              input: {
+                disableUnderline: true,
+                sx: {
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 1, sm: 1.25 },
+                  fontSize: { xs: "0.9375rem", sm: "0.875rem" },
+                  lineHeight: 1.6,
+                },
+              },
+            }}
           />
 
-          <div className="flex items-center justify-between px-2.5 pb-2.5 pt-1">
-            <div className="flex items-center gap-0.5">
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                className="hidden"
-                onChange={handleFileChange}
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className={toolButtonClass()}
-                aria-label={t("chat.input.attachFile")}
-                title={t("chat.input.attachFile")}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: { xs: 1, sm: 1.25 },
+              pb: { xs: 1, sm: 1.25 },
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
+              <input ref={fileInputRef} type="file" multiple hidden onChange={handleFileChange} />
+              <Tooltip title={t("chat.input.attachFile")}>
+                <IconButton size="small" onClick={() => fileInputRef.current?.click()} sx={toolButtonSx()}>
+                  <Paperclip size={16} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={isWebSearchEnabled ? t("chat.input.webSearchActive") : t("chat.input.webSearch")}>
+                <IconButton size="small" onClick={toggleWebSearch} sx={toolButtonSx(isWebSearchEnabled)}>
+                  <Globe size={16} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip
+                title={isReasoningEnabled ? t("chat.input.deepThinkActive") : t("chat.input.deepThink")}
               >
-                <Paperclip className="size-4" />
-              </button>
-              <button
-                onClick={toggleWebSearch}
-                className={toolButtonClass(isWebSearchEnabled)}
-                aria-label={
-                  isWebSearchEnabled
-                    ? t("chat.input.webSearchActive")
-                    : t("chat.input.webSearch")
-                }
-                title={
-                  isWebSearchEnabled
-                    ? t("chat.input.webSearchActive")
-                    : t("chat.input.webSearch")
-                }
-              >
-                <Globe className="size-4" />
-              </button>
-              <button
-                onClick={toggleReasoning}
-                className={toolButtonClass(isReasoningEnabled)}
-                aria-label={
-                  isReasoningEnabled
-                    ? t("chat.input.deepThinkActive")
-                    : t("chat.input.deepThink")
-                }
-                title={
-                  isReasoningEnabled
-                    ? t("chat.input.deepThinkActive")
-                    : t("chat.input.deepThink")
-                }
-              >
-                <BrainCircuit className="size-4" />
-              </button>
-              <button
-                className={toolButtonClass()}
-                aria-label={t("chat.input.voiceInput")}
-                title={t("chat.input.voiceInput")}
-              >
-                <Mic className="size-4" />
-              </button>
-            </div>
+                <IconButton size="small" onClick={toggleReasoning} sx={toolButtonSx(isReasoningEnabled)}>
+                  <BrainCircuit size={16} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("chat.input.voiceInput")}>
+                <IconButton size="small" sx={{ ...toolButtonSx(), display: { xs: "none", sm: "flex" } }}>
+                  <Mic size={16} />
+                </IconButton>
+              </Tooltip>
+            </Box>
 
             {isGenerating ? (
-              <button
+              <Box
+                component="button"
                 onClick={stopGeneration}
-                className="flex h-8.5 items-center gap-1.5 rounded-full bg-zinc-950 px-3.5 text-[12.5px] font-medium text-white shadow-sm transition-all hover:bg-zinc-800 active:scale-95 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
-                aria-label={t("chat.input.stop")}
-                title={t("chat.input.stop")}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.75,
+                  height: 34,
+                  px: 1.5,
+                  borderRadius: 8,
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  "&:hover": { bgcolor: "primary.dark" },
+                  "&:active": { transform: "scale(0.97)" },
+                }}
               >
-                <Square className="size-3 fill-current" />
-                Stop
-              </button>
+                <Square size={12} style={{ fill: "currentColor" }} />
+                {t("chat.input.stop")}
+              </Box>
             ) : (
-              <button
-                onClick={handleSend}
-                disabled={!input.trim()}
-                className={cn(
-                  "flex size-8.5 items-center justify-center rounded-full bg-zinc-950 text-white shadow-sm transition-all duration-150",
-                  "hover:bg-zinc-800 active:scale-95",
-                  "disabled:pointer-events-none disabled:opacity-35",
-                  "dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
-                )}
-                aria-label={t("chat.input.send")}
-                title={t("chat.input.send")}
-              >
-                <ArrowUp className="size-4" strokeWidth={2.4} />
-              </button>
+              <Tooltip title={t("chat.input.send")}>
+                <Box
+                  component="button"
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  sx={sendButtonSx}
+                >
+                  <ArrowUp size={16} strokeWidth={2.4} />
+                </Box>
+              </Tooltip>
             )}
-          </div>
-        </div>
+          </Box>
+        </Paper>
 
-        <p className="mt-2 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
+        <Typography
+          sx={{
+            mt: { xs: 0.75, sm: 1.25 },
+            textAlign: "center",
+            fontSize: "0.6875rem",
+            color: "text.disabled",
+          }}
+        >
           {t("chat.input.disclaimer")}
-        </p>
-      </div>
-    </div>
+        </Typography>
+      </Box>
+    </Box>
   )
 }

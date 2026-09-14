@@ -1,13 +1,7 @@
 import * as React from "react"
 import { useTranslation } from "react-i18next"
-import {
-  Copy,
-  RotateCcw,
-  ThumbsUp,
-  ThumbsDown,
-  Volume2,
-  Sparkles,
-} from "lucide-react"
+import { Box, Typography, Avatar, Tooltip, IconButton } from "@mui/material"
+import { Copy, RotateCcw, ThumbsUp, ThumbsDown, Volume2, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import ReactMarkdown from "react-markdown"
 import rehypeHighlight from "rehype-highlight"
@@ -15,7 +9,6 @@ import type { ChatMessage } from "../../types"
 import { ThinkingAccordion } from "./thinking-accordion"
 import { CodeBlock } from "./code-block"
 import { AVAILABLE_MODELS } from "../../hooks/use-chat-store"
-import { cn } from "@/lib/utils"
 
 interface AssistantMessageProps {
   message: ChatMessage
@@ -32,16 +25,41 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
     toast.success(t("chat.messages.copySuccess"))
   }
 
-  return (
-    <div className="group flex gap-3">
-      <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white shadow-sm dark:bg-zinc-100 dark:text-zinc-950">
-        <Sparkles className="size-3.5" strokeWidth={2.2} />
-      </div>
+  const actionIconSx = (active = false) => ({
+    width: 26,
+    height: 26,
+    color: active ? "text.primary" : "text.disabled",
+    transition: "all 0.15s ease",
+    "&:hover": { bgcolor: "action.hover", color: "text.primary" },
+  })
 
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-400 dark:text-zinc-500">
+  return (
+    <Box sx={{ display: "flex", gap: 1.5, "&:hover .assistant-actions": { opacity: 1 } }}>
+      <Avatar
+        sx={{
+          width: 28,
+          height: 28,
+          borderRadius: 1.5,
+          bgcolor: "secondary.main",
+          color: "secondary.contrastText",
+          mt: 0.25,
+        }}
+      >
+        <Sparkles size={14} strokeWidth={2.2} />
+      </Avatar>
+
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75, minWidth: 0, flex: 1 }}>
+        <Typography
+          sx={{
+            fontSize: "0.6875rem",
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "text.disabled",
+          }}
+        >
           {modelName}
-        </p>
+        </Typography>
 
         {message.thinking && (
           <ThinkingAccordion
@@ -51,7 +69,40 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
           />
         )}
 
-        <div className="prose-chat min-w-0">
+        <Box
+          sx={{
+            "& pre": {
+              m: 0,
+              p: 2,
+              borderRadius: 2,
+              bgcolor: "background.default",
+              overflow: "auto",
+              fontSize: "0.75rem",
+              lineHeight: 1.6,
+              fontFamily: '"Geist Mono", "Fira Code", Consolas, monospace',
+              border: "1px solid",
+              borderColor: "divider",
+            },
+            "& code": {
+              fontFamily: '"Geist Mono", "Fira Code", Consolas, monospace',
+              fontSize: "0.84375em",
+            },
+            "& :not(pre) > code": {
+              px: 0.5,
+              py: 0.25,
+              borderRadius: 0.75,
+              bgcolor: "action.hover",
+              fontSize: "0.84375em",
+            },
+            "& p": { my: 0.75, fontSize: "0.875rem", lineHeight: 1.75 },
+            "& ul, & ol": { pl: 3, my: 0.75 },
+            "& li": { my: 0.25, fontSize: "0.875rem", lineHeight: 1.75 },
+            "& strong": { fontWeight: 600 },
+            "& h1, & h2, & h3, & h4": { mt: 1.5, mb: 0.5, fontWeight: 600, letterSpacing: "-0.02em" },
+            "& blockquote": { m: "1rem 0", pl: 2, borderLeft: "2px solid", borderColor: "divider", color: "text.secondary" },
+            "& a": { color: "text.primary", textDecoration: "underline", textUnderlineOffset: 2 },
+          }}
+        >
           <ReactMarkdown
             rehypePlugins={[rehypeHighlight]}
             components={{
@@ -71,75 +122,74 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
           >
             {message.content}
           </ReactMarkdown>
-        </div>
+        </Box>
 
         {message.isStreaming && (
-          <div className="mt-1 flex items-center gap-1.5 pl-0.5 text-[11px] text-zinc-400 dark:text-zinc-500">
-            <span className="animate-pulse-dot size-1.5 rounded-full bg-zinc-400" />
-            Generating
-            <span className="animate-pulse-dot size-1.5 rounded-full bg-zinc-400" style={{ animationDelay: "0.2s" }} />
-            <span className="animate-pulse-dot size-1.5 rounded-full bg-zinc-400" style={{ animationDelay: "0.4s" }} />
-          </div>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5, color: "text.disabled" }}>
+            {[0, 1, 2].map((i) => (
+              <Box
+                key={i}
+                sx={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  bgcolor: "text.disabled",
+                  animation: "pulse 1.4s ease-in-out infinite",
+                  animationDelay: `${i * 0.2}s`,
+                }}
+              />
+            ))}
+            <Typography sx={{ fontSize: "0.6875rem", ml: 0.5 }}>Generating</Typography>
+          </Box>
         )}
 
         {!message.isStreaming && message.content && (
-          <div
-            className={cn(
-              "mt-1.5 flex items-center gap-0.5 text-zinc-400 opacity-0 transition-opacity duration-150 group-hover:opacity-100 dark:text-zinc-500"
-            )}
+          <Box
+            className="assistant-actions"
+            sx={{ display: "flex", alignItems: "center", gap: 0.25, mt: 0.5, opacity: 0, transition: "opacity 0.15s ease" }}
           >
-            <button
-              onClick={handleCopy}
-              className="flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-              aria-label={t("chat.messages.copyCode")}
-            >
-              <Copy className="size-3" />
-            </button>
-            <button
-              className="flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-              aria-label={t("chat.messages.regenerate")}
-            >
-              <RotateCcw className="size-3" />
-            </button>
-            <button
-              onClick={() => setFeedback(feedback === "good" ? null : "good")}
-              className={cn(
-                "flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800",
-                feedback === "good"
-                  ? "text-zinc-950 dark:text-zinc-50"
-                  : "hover:text-zinc-700 dark:hover:text-zinc-200"
-              )}
-              aria-label={t("chat.messages.goodResponse")}
-            >
-              <ThumbsUp className="size-3" />
-            </button>
-            <button
-              onClick={() => setFeedback(feedback === "bad" ? null : "bad")}
-              className={cn(
-                "flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800",
-                feedback === "bad"
-                  ? "text-zinc-950 dark:text-zinc-50"
-                  : "hover:text-zinc-700 dark:hover:text-zinc-200"
-              )}
-              aria-label={t("chat.messages.badResponse")}
-            >
-              <ThumbsDown className="size-3" />
-            </button>
-            <button
-              className="flex size-6.5 items-center justify-center rounded-md transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-              aria-label={t("chat.messages.readAloud")}
-            >
-              <Volume2 className="size-3" />
-            </button>
+            <Tooltip title={t("chat.messages.copyCode")}>
+              <IconButton size="small" onClick={handleCopy} sx={actionIconSx()}>
+                <Copy size={13} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("chat.messages.regenerate")}>
+              <IconButton size="small" sx={actionIconSx()}>
+                <RotateCcw size={13} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("chat.messages.goodResponse")}>
+              <IconButton
+                size="small"
+                onClick={() => setFeedback(feedback === "good" ? null : "good")}
+                sx={actionIconSx(feedback === "good")}
+              >
+                <ThumbsUp size={13} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("chat.messages.badResponse")}>
+              <IconButton
+                size="small"
+                onClick={() => setFeedback(feedback === "bad" ? null : "bad")}
+                sx={actionIconSx(feedback === "bad")}
+              >
+                <ThumbsDown size={13} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("chat.messages.readAloud")}>
+              <IconButton size="small" sx={actionIconSx()}>
+                <Volume2 size={13} />
+              </IconButton>
+            </Tooltip>
 
             {message.totalTokens && message.tokensPerSecond && (
-              <span className="ml-1.5 rounded-md px-1.5 py-px font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
+              <Typography sx={{ ml: 1, fontSize: "0.625rem", fontFamily: "monospace", color: "text.disabled" }}>
                 {message.tokensPerSecond} tok/s · {message.totalTokens} tok
-              </span>
+              </Typography>
             )}
-          </div>
+          </Box>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 }

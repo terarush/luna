@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next"
+import { Box, Typography, Paper } from "@mui/material"
 import { Code2, Lightbulb, BrainCircuit, Boxes, ArrowUpRight } from "lucide-react"
 import { useChatStore, AVAILABLE_MODELS } from "../../hooks/use-chat-store"
 
@@ -19,48 +20,137 @@ export function ChatEmptyState({ onSendPrompt }: ChatEmptyStateProps) {
   const model = AVAILABLE_MODELS.find((m) => m.id === selectedModel)
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-8 overflow-y-auto px-4 py-10">
-      <div className="animate-fade-in flex flex-col items-center gap-3 text-center">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-lg shadow-zinc-950/15 dark:bg-zinc-100 dark:text-zinc-950">
-          <Code2 className="size-5" strokeWidth={2.2} />
-        </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+    <Box
+      sx={{
+        flex: 1,
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: { xs: 3, sm: 4 },
+        px: { xs: 2, sm: 3 },
+        py: { xs: 6, sm: 10 },
+        overflowY: "auto",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 1.5,
+          textAlign: "center",
+          animation: "fadeIn 0.4s ease-out",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: { xs: 44, sm: 48 },
+            height: { xs: 44, sm: 48 },
+            borderRadius: 3,
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
+            boxShadow: "0 12px 24px rgba(9,9,11,0.18)",
+          }}
+        >
+          <Code2 size={20} strokeWidth={2.2} />
+        </Box>
+        <Typography
+          sx={{
+            fontSize: { xs: "1.25rem", sm: "1.625rem" },
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            mt: 1,
+          }}
+        >
           {t("chat.emptyState.title")}
-        </h1>
-        <p className="max-w-sm text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+        </Typography>
+        <Typography
+          sx={{ fontSize: "0.8125rem", color: "text.secondary", maxWidth: 340, lineHeight: 1.6 }}
+        >
           {t("chat.emptyState.subtitle")}{" "}
-          <span className="font-medium text-zinc-800 dark:text-zinc-200">
+          <Box component="span" sx={{ fontWeight: 500, color: "text.primary" }}>
             {model?.name}
-          </span>
-        </p>
-      </div>
+          </Box>
+        </Typography>
+      </Box>
 
-      <div className="grid w-full max-w-xl grid-cols-1 gap-2.5 sm:grid-cols-2">
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+          gap: { xs: 1, sm: 1.5 },
+          width: "100%",
+          maxWidth: { xs: "100%", sm: 576 },
+        }}
+      >
         {PROMPTS.map((prompt, i) => {
           const Icon = prompt.icon
           return (
-            <button
+            <Paper
               key={prompt.titleKey}
+              variant="outlined"
               onClick={() => onSendPrompt(t(prompt.titleKey))}
-              className="group animate-slide-in-up flex items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-4 text-left outline-none transition-all duration-200 hover:-translate-y-0.5 hover:border-zinc-400 hover:shadow-lg hover:shadow-zinc-950/5 focus-visible:ring-2 focus-visible:ring-zinc-400/50 active:scale-[0.98] dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-600"
-              style={{ animationDelay: `${i * 60}ms` }}
+              sx={{
+                p: { xs: 1.5, sm: 2 },
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 1.5,
+                borderRadius: 3,
+                borderColor: "divider",
+                transition: "all 0.18s ease",
+                animation: `slideInUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 60}ms both`,
+                "&:hover": {
+                  borderColor: "text.disabled",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 8px 20px rgba(9,9,11,0.06)",
+                },
+                "&:active": { transform: "scale(0.98)" },
+                "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main" },
+              }}
             >
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600 transition-colors group-hover:bg-zinc-900 group-hover:text-white dark:bg-zinc-800 dark:text-zinc-300 dark:group-hover:bg-zinc-100 dark:group-hover:text-zinc-950">
-                <Icon className="size-4" strokeWidth={2.2} />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[13px] font-medium text-zinc-800 dark:text-zinc-100">
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 32,
+                  height: 32,
+                  borderRadius: 2,
+                  flexShrink: 0,
+                  bgcolor: "action.selected",
+                  color: "text.secondary",
+                  transition: "all 0.18s ease",
+                  "&:hover": { bgcolor: "primary.main", color: "primary.contrastText" },
+                }}
+              >
+                <Icon size={15} strokeWidth={2.2} />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500 }}>
                   {t(prompt.titleKey)}
-                </span>
-                <span className="mt-0.5 block text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+                </Typography>
+                <Typography
+                  sx={{ fontSize: "0.75rem", color: "text.secondary", mt: 0.25, lineHeight: 1.5 }}
+                >
                   {t(prompt.descKey)}
-                </span>
-              </span>
-              <ArrowUpRight className="size-3.5 shrink-0 text-zinc-300 opacity-0 transition-all group-hover:text-zinc-800 group-hover:opacity-100 dark:text-zinc-600 dark:group-hover:text-zinc-100" />
-            </button>
+                </Typography>
+              </Box>
+              <ArrowUpRight size={14} style={{ flexShrink: 0, opacity: 0.35 }} />
+            </Paper>
           )
         })}
-      </div>
-    </div>
+      </Box>
+
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
+    </Box>
   )
 }

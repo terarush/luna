@@ -1,12 +1,21 @@
 import { useTranslation } from "react-i18next"
+import {
+  Box,
+  Typography,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Tabs,
+  Tab,
+  Switch,
+  Button,
+  Tooltip,
+} from "@mui/material"
 import { Sun, Moon, Monitor, X, Check } from "lucide-react"
-import { Dialog } from "@base-ui/react/dialog"
-import { Tabs } from "@base-ui/react/tabs"
-import { useTheme } from "@/shared/theme-provider"
+import { useMuiTheme } from "@/shared/themes/mui-theme-provider"
 import { changeLocale, supportedLocales } from "@/lib/i18n"
 import type { Locale } from "@/lib/i18n"
-import { Switch } from "@/components/ui/switch"
-import { cn } from "@/lib/utils"
 
 interface ChatSettingsDialogProps {
   open: boolean
@@ -21,130 +30,115 @@ const THEME_OPTIONS = [
 
 export function ChatSettingsDialog({ open, onOpenChange }: ChatSettingsDialogProps) {
   const { t, i18n } = useTranslation()
-  const { theme, setTheme } = useTheme()
+  const { mode, setMode } = useMuiTheme()
   const language = (i18n.resolvedLanguage ?? "en") as Locale
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-zinc-950/35 backdrop-blur-sm data-[starting-style]:animate-fade-in data-[ending-style]:animate-fade-in dark:bg-zinc-950/50" />
-        <Dialog.Popup className="fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl shadow-zinc-950/10 outline-none data-[starting-style]:animate-scale-in dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/50">
-          <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
-            <Dialog.Title className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-              {t("chat.settings.title")}
-            </Dialog.Title>
-            <Dialog.Close className="flex size-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">
-              <X className="size-4" />
-            </Dialog.Close>
-          </div>
+    <Dialog open={open} onClose={() => onOpenChange(false)} fullWidth maxWidth="xs">
+      <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pr: 1.5, pb: 1.5 }}>
+        <Typography sx={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "-0.01em" }}>
+          {t("chat.settings.title")}
+        </Typography>
+        <Tooltip title="Close">
+          <IconButton size="small" onClick={() => onOpenChange(false)}>
+            <X size={16} />
+          </IconButton>
+        </Tooltip>
+      </DialogTitle>
 
-          <Tabs.Root defaultValue="general">
-            <Tabs.List className="flex gap-0.5 border-b border-zinc-100 px-3 pt-2 dark:border-zinc-800">
-              {[
-                { value: "general", label: t("chat.settings.tabGeneral") },
-                { value: "models", label: t("chat.settings.tabModels") },
-                { value: "interface", label: t("chat.settings.tabInterface") },
-                { value: "audio", label: t("chat.settings.tabAudio") },
-              ].map((tab) => (
-                <Tabs.Tab
-                  key={tab.value}
-                  value={tab.value}
-                  className={cn(
-                    "rounded-t-lg px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 outline-none transition-colors",
-                    "hover:text-zinc-800 dark:hover:text-zinc-200",
-                    "data-[selected]:bg-zinc-100/80 data-[selected]:text-zinc-900",
-                    "dark:data-[selected]:bg-zinc-800/80 dark:data-[selected]:text-zinc-50"
-                  )}
+      <Tabs
+        value="general"
+        variant="fullWidth"
+        sx={{
+          px: 2,
+          "& .MuiTabs-flexContainer": { gap: 0.5 },
+          "& .MuiTab-root": { borderRadius: 2, minHeight: 36, fontSize: "0.75rem", py: 0.75 },
+          "& .MuiTabs-indicator": { display: "none" },
+          "& .Mui-selected": { bgcolor: "action.selected", fontWeight: 600 },
+        }}
+      >
+        <Tab label={t("chat.settings.tabGeneral")} value="general" />
+        <Tab label={t("chat.settings.tabModels")} value="models" />
+        <Tab label={t("chat.settings.tabInterface")} value="interface" />
+        <Tab label={t("chat.settings.tabAudio")} value="audio" />
+      </Tabs>
+
+      <DialogContent sx={{ pt: 2.5, display: "flex", flexDirection: "column", gap: 3, pb: 3 }}>
+        <Box>
+          <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500, mb: 1.5 }}>
+            {t("chat.settings.theme")}
+          </Typography>
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1 }}>
+            {THEME_OPTIONS.map((opt) => {
+              const Icon = opt.icon
+              const active = mode === opt.value
+              return (
+                <Button
+                  key={opt.value}
+                  variant="outlined"
+                  onClick={() => setMode(opt.value)}
+                  sx={{
+                    flexDirection: "column",
+                    gap: 0.75,
+                    py: 1.5,
+                    borderRadius: 2,
+                    borderColor: active ? "text.primary" : "divider",
+                    color: active ? "text.primary" : "text.secondary",
+                    bgcolor: active ? "action.selected" : "transparent",
+                    fontSize: "0.75rem",
+                    fontWeight: 500,
+                    transition: "all 0.15s ease",
+                    "&:hover": {
+                      borderColor: "text.primary",
+                      bgcolor: active ? "action.selected" : "action.hover",
+                    },
+                    "&:active": { transform: "scale(0.97)" },
+                  }}
                 >
-                  {tab.label}
-                </Tabs.Tab>
-              ))}
-            </Tabs.List>
+                  <Icon size={16} />
+                  {opt.label}
+                  {active && <Check size={12} />}
+                </Button>
+              )
+            })}
+          </Box>
+        </Box>
 
-            <div className="max-h-[60vh] overflow-y-auto p-5">
-              <Tabs.Panel value="general" className="space-y-6 outline-none">
-                <div>
-                  <p className="mb-2.5 text-[13px] font-medium text-zinc-800 dark:text-zinc-100">
-                    {t("chat.settings.theme")}
-                  </p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {THEME_OPTIONS.map((opt) => {
-                      const Icon = opt.icon
-                      const active = theme === opt.value
-                      return (
-                        <button
-                          key={opt.value}
-                          onClick={() => setTheme(opt.value)}
-                          className={cn(
-                            "flex flex-col items-center gap-1.5 rounded-xl border py-3 text-[12px] font-medium transition-all duration-150",
-                            "outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40 active:scale-[0.97]",
-                            active
-                              ? "border-sky-400 bg-sky-50/60 text-sky-600 ring-1 ring-sky-400/30 dark:border-sky-500 dark:bg-sky-500/10 dark:text-sky-400"
-                              : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/60"
-                          )}
-                        >
-                          <Icon className="size-4" />
-                          {opt.label}
-                          {active && <Check className="size-3" />}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
+        <Box>
+          <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500, mb: 1.5 }}>
+            {t("chat.settings.language")}
+          </Typography>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {supportedLocales.map((locale) => (
+              <Button
+                key={locale}
+                size="small"
+                variant={language === locale ? "contained" : "outlined"}
+                onClick={() => changeLocale(locale)}
+                sx={{ borderRadius: 1.5, fontSize: "0.75rem" }}
+              >
+                {locale === "en" ? "English" : "Bahasa Indonesia"}
+              </Button>
+            ))}
+          </Box>
+        </Box>
 
-                <div>
-                  <p className="mb-2.5 text-[13px] font-medium text-zinc-800 dark:text-zinc-100">
-                    {t("chat.settings.language")}
-                  </p>
-                  <div className="flex gap-2">
-                    {supportedLocales.map((locale) => (
-                      <button
-                        key={locale}
-                        onClick={() => changeLocale(locale)}
-                        className={cn(
-                          "rounded-lg border px-4 py-2 text-[12.5px] font-medium transition-all duration-150 outline-none",
-                          "focus-visible:ring-2 focus-visible:ring-sky-500/40 active:scale-[0.97]",
-                          language === locale
-                            ? "border-zinc-950 bg-zinc-950 text-white dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950"
-                            : "border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800/60"
-                        )}
-                      >
-                        {locale === "en" ? "English" : "Bahasa Indonesia"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </Tabs.Panel>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 2, border: "1px solid", borderColor: "divider", px: 2, py: 1.5 }}>
+          <Box>
+            <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500 }}>{t("chat.settings.enterToSend")}</Typography>
+            <Typography sx={{ fontSize: "0.6875rem", color: "text.secondary", mt: 0.25 }}>Shift+Enter for a new line</Typography>
+          </Box>
+          <Switch defaultChecked size="small" />
+        </Box>
 
-              <Tabs.Panel value="models" className="outline-none">
-                <p className="text-[13px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-                  Model management coming soon. Connect to Ollama or add custom API endpoints.
-                </p>
-              </Tabs.Panel>
+        <Typography sx={{ fontSize: "0.75rem", color: "text.secondary", lineHeight: 1.6 }}>
+          Model management coming soon. Connect to Ollama or add custom API endpoints.
+        </Typography>
 
-              <Tabs.Panel value="interface" className="outline-none">
-                <div className="flex items-center justify-between rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-700">
-                  <div>
-                    <p className="text-[13px] font-medium text-zinc-800 dark:text-zinc-100">
-                      {t("chat.settings.enterToSend")}
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
-                      Shift+Enter for a new line
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              </Tabs.Panel>
-
-              <Tabs.Panel value="audio" className="outline-none">
-                <p className="text-[13px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-                  Text-to-speech settings coming soon.
-                </p>
-              </Tabs.Panel>
-            </div>
-          </Tabs.Root>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+        <Typography sx={{ fontSize: "0.75rem", color: "text.secondary", lineHeight: 1.6 }}>
+          Text-to-speech settings coming soon.
+        </Typography>
+      </DialogContent>
+    </Dialog>
   )
 }

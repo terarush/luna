@@ -1,11 +1,6 @@
-import { useTranslation } from "react-i18next"
-import { Brain, ChevronRight, Loader2 } from "lucide-react"
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-  CollapsibleInner,
-} from "@/components/ui/collapsible"
+import * as React from "react"
+import { Box, Collapse, Typography } from "@mui/material"
+import { ChevronDown, Eye, Loader2 } from "lucide-react"
 
 interface ThinkingAccordionProps {
   content: string
@@ -14,35 +9,66 @@ interface ThinkingAccordionProps {
 }
 
 export function ThinkingAccordion({ content, duration, isStreaming }: ThinkingAccordionProps) {
-  const { t } = useTranslation()
+  const [open, setOpen] = React.useState(false)
 
   return (
-    <Collapsible className="my-1.5 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50/70 dark:border-zinc-800 dark:bg-zinc-900/60">
-      <CollapsibleTrigger className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60">
-        <Brain className="size-3.5 shrink-0 text-zinc-400" />
-        <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
-          {t("chat.messages.thoughtTitle")}
-        </span>
-        {duration && !isStreaming && (
-          <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
-            {t("chat.messages.thoughtDuration", { seconds: duration })}
-          </span>
+    <Box>
+      <Box
+        component="button"
+        onClick={() => setOpen((o) => !o)}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          px: 1.25,
+          py: 0.375,
+          borderRadius: 3,
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
+          cursor: "pointer",
+          transition: "all 0.15s ease",
+          "&:hover": { bgcolor: "action.hover" },
+          "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main" },
+        }}
+      >
+        <Eye size={12} style={{ opacity: 0.6 }} />
+        <Typography sx={{ fontSize: "0.6875rem", fontWeight: 500, color: "text.secondary" }}>
+          Thinking
+        </Typography>
+        {isStreaming && <Loader2 size={12} style={{ animation: "spin 1s linear infinite", color: "text.disabled" }} />}
+        {duration && (
+          <Typography sx={{ fontSize: "0.6875rem", fontFamily: "monospace", color: "text.disabled" }}>
+            {duration}s
+          </Typography>
         )}
-        {isStreaming && (
-          <span className="flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-400">
-            <Loader2 className="size-3 animate-spin" />
-            Thinking
-          </span>
-        )}
-        <ChevronRight className="ml-auto size-3.5 shrink-0 text-zinc-400 transition-transform duration-200 data-[panel-open]:rotate-90" />
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <CollapsibleInner>
-          <p className="border-t border-zinc-100 px-3 py-2.5 font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
-            {content}
-          </p>
-        </CollapsibleInner>
-      </CollapsibleContent>
-    </Collapsible>
+        <ChevronDown
+          size={12}
+          style={{
+            transition: "transform 0.2s ease",
+            transform: open ? "rotate(180deg)" : "none",
+            opacity: 0.5,
+          }}
+        />
+      </Box>
+      <Collapse in={open} unmountOnExit>
+        <Box
+          sx={{
+            mt: 1,
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: "background.default",
+            border: "1px solid",
+            borderColor: "divider",
+            fontSize: "0.75rem",
+            lineHeight: 1.7,
+            color: "text.secondary",
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {content}
+        </Box>
+      </Collapse>
+    </Box>
   )
 }

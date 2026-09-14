@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Box, useMediaQuery, useTheme } from "@mui/material"
 import { ChatSidebar } from "./components/sidebar/chat-sidebar"
 import { ChatHeader } from "./components/header/chat-header"
 import { ChatMessagesContainer } from "./components/messages/chat-messages-container"
@@ -10,7 +11,19 @@ import { useChatStore } from "./hooks/use-chat-store"
 export default function ChatPage() {
   const [paramsOpen, setParamsOpen] = React.useState(false)
   const [settingsOpen, setSettingsOpen] = React.useState(false)
-  const [sidebarOpen, setSidebarOpen] = React.useState(true)
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+
+  // Desktop: open by default. Mobile: closed by default.
+  const [sidebarOpen, setSidebarOpen] = React.useState(!isMobile)
+
+  // Close sidebar when switching to mobile
+  React.useEffect(() => {
+    if (isMobile) setSidebarOpen(false)
+    else setSidebarOpen(true)
+  }, [isMobile])
+
   const { sendMessage } = useChatStore()
 
   const handleSendPrompt = React.useCallback(
@@ -20,14 +33,30 @@ export default function ChatPage() {
     [sendMessage]
   )
 
+  // On mobile, close sidebar after selecting a session
+  const handleSidebarClose = React.useCallback(() => {
+    if (isMobile) setSidebarOpen(false)
+  }, [isMobile])
+
   return (
-    <div className="flex h-dvh overflow-hidden">
+    <Box sx={{ display: "flex", height: "100dvh", overflow: "hidden" }}>
       <ChatSidebar
         open={sidebarOpen}
+        isMobile={isMobile}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         onOpenSettings={() => setSettingsOpen(true)}
+        onSessionSelect={handleSidebarClose}
       />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
+          // On desktop constrain max width; on mobile full width
+          width: "100%",
+        }}
+      >
         <ChatHeader
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
@@ -35,9 +64,9 @@ export default function ChatPage() {
         />
         <ChatMessagesContainer onSendPrompt={handleSendPrompt} />
         <ChatInputBar />
-      </div>
+      </Box>
       <ChatParametersSheet open={paramsOpen} onOpenChange={setParamsOpen} />
       <ChatSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
-    </div>
+    </Box>
   )
 }
