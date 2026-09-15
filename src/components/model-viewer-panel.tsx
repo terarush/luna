@@ -11,7 +11,7 @@ export function ModelViewerPanel() {
         height: "100%",
         position: "relative",
         background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)",
-        borderRadius: "12px",
+        borderRadius: "16px",
         overflow: "hidden",
       }}
     >
@@ -28,11 +28,17 @@ export function ModelViewerPanel() {
             alignItems: "center",
             gap: 8,
             padding: "6px 12px",
-            borderRadius: 20,
-            background: "rgba(239, 68, 68, 0.8)",
+            borderRadius: "10px",
+            background: "rgba(225, 29, 72, 0.7)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            boxShadow:
+              "0 8px 24px rgba(225, 29, 72, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.45)",
             color: "#fff",
             fontSize: 12,
             fontWeight: 600,
+            letterSpacing: "-0.01em",
           }}
         >
           <span

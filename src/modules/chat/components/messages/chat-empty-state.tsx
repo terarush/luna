@@ -101,16 +101,33 @@ export function ChatEmptyState({ onSendPrompt }: ChatEmptyStateProps) {
                 display: "flex",
                 alignItems: "flex-start",
                 gap: 1.5,
-                borderRadius: 3,
-                borderColor: "divider",
-                transition: "all 0.18s ease",
+                borderRadius: 3.5,
+                bgcolor: "background.paper",
+                backdropFilter: "blur(20px) saturate(180%)",
+                WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                border: "1px solid",
+                borderColor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(255, 255, 255, 0.1)"
+                    : "rgba(0, 0, 0, 0.06)",
+                boxShadow: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 4px 16px rgba(0,0,0,0.25)"
+                    : "inset 0 1px 0 0 rgba(255, 255, 255, 0.95), 0 4px 16px rgba(0,0,0,0.03)",
+                transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
                 animation: `slideInUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 60}ms both`,
                 "&:hover": {
-                  borderColor: "text.disabled",
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 8px 20px rgba(9,9,11,0.06)",
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(255, 255, 255, 0.2)"
+                      : "rgba(0, 0, 0, 0.14)",
+                  transform: "translateY(-2px) scale(1.01)",
+                  boxShadow: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 8px 24px rgba(0,0,0,0.4)"
+                      : "inset 0 1px 0 0 rgba(255, 255, 255, 1), 0 8px 24px rgba(0,0,0,0.06)",
                 },
-                "&:active": { transform: "scale(0.98)" },
+                "&:active": { transform: "scale(0.97)" },
                 "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main" },
               }}
             >

@@ -103,15 +103,36 @@ export function ChatHistoryItem({
             height: 36,
             px: 1.5,
             py: 0.5,
-            borderRadius: 1.5,
+            borderRadius: 2,
             cursor: "pointer",
             textAlign: "left",
             color: isActive ? "text.primary" : "text.secondary",
             fontWeight: isActive ? 500 : 400,
-            bgcolor: isActive ? "action.selected" : "transparent",
-            transition: "background-color 0.12s ease, color 0.12s ease",
+            bgcolor: isActive
+              ? (theme) =>
+                  theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.85)"
+              : "transparent",
+            border: "1px solid",
+            borderColor: isActive
+              ? (theme) =>
+                  theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.06)"
+              : "transparent",
+            boxShadow: isActive
+              ? (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "inset 0 1px 0 0 rgba(255, 255, 255, 0.18), 0 2px 8px rgba(0,0,0,0.25)"
+                    : "inset 0 1px 0 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(0,0,0,0.04)"
+              : "none",
+            transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
             userSelect: "none",
-            "&:hover": { bgcolor: isActive ? "action.selected" : "action.hover" },
+            "&:hover": {
+              bgcolor: isActive
+                ? (theme) =>
+                    theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.14)" : "rgba(255, 255, 255, 0.95)"
+                : (theme) =>
+                    theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.04)",
+            },
+            "&:active": { transform: "scale(0.98)" },
             "&:hover .more-btn": { opacity: 1 },
             "&:focus-visible": {
               outline: "2px solid",

@@ -57,14 +57,28 @@ export function ModelSelector() {
           display: "flex",
           alignItems: "center",
           gap: 1,
-          height: 32,
+          height: 34,
           px: 1.5,
-          borderRadius: 1.5,
-          border: "none",
-          background: "transparent",
+          borderRadius: "10px",
+          border: "1px solid",
+          borderColor: (theme) =>
+            theme.palette.mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)",
+          bgcolor: (theme) =>
+            theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.06)" : "rgba(255, 255, 255, 0.65)",
+          color: "text.primary",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          boxShadow: (theme) =>
+            theme.palette.mode === "dark"
+              ? "inset 0 1px 0 0 rgba(255, 255, 255, 0.12)"
+              : "inset 0 1px 0 0 rgba(255, 255, 255, 0.9)",
           cursor: "pointer",
-          transition: "background-color 0.15s ease",
-          "&:hover": { bgcolor: "action.hover" },
+          transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
+          "&:hover": {
+            bgcolor: (theme) =>
+              theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.9)",
+          },
+          "&:active": { transform: "scale(0.97)" },
           "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 1 },
         }}
       >
@@ -78,9 +92,11 @@ export function ModelSelector() {
             fontWeight: 500,
             px: 0.75,
             py: 0.25,
-            borderRadius: 1,
+            borderRadius: "6px",
             border: "1px solid",
             borderColor: "divider",
+            bgcolor: (theme) =>
+              theme.palette.mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
             color: "text.secondary",
             whiteSpace: "nowrap",
           }}
@@ -99,7 +115,25 @@ export function ModelSelector() {
           setShowAddForm(false)
         }}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        slotProps={{ paper: { sx: { width: 320, mt: 0.75, borderRadius: 3, border: "1px solid", borderColor: "divider", boxShadow: "0 12px 32px rgba(9,9,11,0.1)", p: 0.75 } } }}
+        slotProps={{
+          paper: {
+            sx: {
+              width: 320,
+              mt: 1,
+              borderRadius: "14px",
+              border: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+              backdropFilter: "blur(26px) saturate(190%)",
+              WebkitBackdropFilter: "blur(26px) saturate(190%)",
+              boxShadow: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "0 20px 48px rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.16)"
+                  : "0 16px 40px rgba(0,0,0,0.08), inset 0 1px 0 0 rgba(255,255,255,0.9)",
+              p: 0.75,
+            },
+          },
+        }}
       >
         <Box sx={{ pt: 0.5, px: 1, display: "flex", alignItems: "center", gap: 1 }}>
           <TextField

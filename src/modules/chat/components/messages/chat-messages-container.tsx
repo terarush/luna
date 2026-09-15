@@ -105,18 +105,28 @@ export function ChatMessagesContainer({ onSendPrompt }: ChatMessagesContainerPro
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 36,
-            height: 36,
+            width: 38,
+            height: 38,
             borderRadius: "50%",
             border: "1px solid",
-            borderColor: "divider",
+            borderColor: (theme) =>
+              theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.16)" : "rgba(255, 255, 255, 0.8)",
             bgcolor: "background.paper",
-            color: "text.secondary",
+            backdropFilter: "blur(24px) saturate(190%)",
+            WebkitBackdropFilter: "blur(24px) saturate(190%)",
+            color: "text.primary",
             cursor: "pointer",
-            boxShadow: "0 8px 24px rgba(9,9,11,0.1)",
-            transition: "all 0.15s ease",
-            "&:hover": { bgcolor: "action.hover", color: "text.primary" },
-            "&:active": { transform: "translateX(-50%) scale(0.95)" },
+            boxShadow: (theme) =>
+              theme.palette.mode === "dark"
+                ? "0 10px 28px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.2)"
+                : "0 8px 24px rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.95)",
+            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+            "&:hover": {
+              transform: "translateX(-50%) translateY(-2px)",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.14)" : "rgba(255, 255, 255, 0.95)",
+            },
+            "&:active": { transform: "translateX(-50%) scale(0.92)" },
             "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main" },
           }}
           aria-label="Scroll to bottom"

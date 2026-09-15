@@ -55,8 +55,15 @@ export function ChatParametersSheet({ open, onOpenChange }: ChatParametersSheetP
         paper: {
           sx: {
             width: { xs: "100%", sm: 400 },
+            bgcolor: "background.paper",
+            backdropFilter: "blur(28px) saturate(190%)",
+            WebkitBackdropFilter: "blur(28px) saturate(190%)",
             borderLeft: "1px solid",
             borderColor: "divider",
+            boxShadow: (theme) =>
+              theme.palette.mode === "dark"
+                ? "-12px 0 40px rgba(0,0,0,0.5), inset 1px 0 0 0 rgba(255,255,255,0.14)"
+                : "-8px 0 32px rgba(0,0,0,0.06), inset 1px 0 0 0 rgba(255,255,255,0.85)",
           },
         },
       }}

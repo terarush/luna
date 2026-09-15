@@ -24,8 +24,16 @@ export function ChatHeader({ sidebarOpen, onToggleSidebar, onOpenParameters }: C
 
   const actionButtonSx = {
     color: "text.secondary",
-    transition: "all 0.15s ease",
-    "&:hover": { bgcolor: "action.hover", color: "text.primary" },
+    borderRadius: 2,
+    transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+    "&:hover": {
+      bgcolor: (theme) =>
+        theme.palette.mode === "dark"
+          ? "rgba(255, 255, 255, 0.08)"
+          : "rgba(0, 0, 0, 0.05)",
+      color: "text.primary",
+    },
+    "&:active": { transform: "scale(0.92)" },
   } as const
 
   return (
@@ -41,7 +49,14 @@ export function ChatHeader({ sidebarOpen, onToggleSidebar, onOpenParameters }: C
         minHeight: { xs: 52, sm: 56 },
         flexShrink: 0,
         bgcolor: "background.paper",
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        boxShadow: (theme) =>
+          theme.palette.mode === "dark"
+            ? "inset 0 -1px 0 0 rgba(255, 255, 255, 0.08), 0 4px 20px rgba(0,0,0,0.18)"
+            : "inset 0 -1px 0 0 rgba(255, 255, 255, 0.8), 0 4px 16px rgba(0,0,0,0.03)",
         gap: 1,
+        zIndex: 10,
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, minWidth: 0 }}>

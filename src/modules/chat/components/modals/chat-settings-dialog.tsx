@@ -68,23 +68,46 @@ export function ChatSettingsDialog({ open, onOpenChange }: ChatSettingsDialogPro
         </Tooltip>
       </DialogTitle>
 
-      <Tabs
-        value={tab}
-        onChange={(_, v) => setTab(v)}
-        variant="fullWidth"
-        sx={{
-          px: 2,
-          "& .MuiTabs-flexContainer": { gap: 0.5 },
-          "& .MuiTab-root": { borderRadius: 2, minHeight: 36, fontSize: "0.75rem", py: 0.75 },
-          "& .MuiTabs-indicator": { display: "none" },
-          "& .Mui-selected": { bgcolor: "action.selected", fontWeight: 600 },
-        }}
-      >
-        <Tab label={t("chat.settings.tabGeneral")} value="general" />
-        <Tab label={t("chat.settings.tabModels")} value="models" />
-        <Tab label={t("chat.settings.tabInterface")} value="interface" />
-        <Tab label={t("chat.settings.tabAudio")} value="audio" />
-      </Tabs>
+      <Box sx={{ px: 2 }}>
+        <Tabs
+          value={tab}
+          onChange={(_, v) => setTab(v)}
+          variant="fullWidth"
+          sx={{
+            p: 0.5,
+            borderRadius: 2.5,
+            bgcolor: (theme) =>
+              theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.04)",
+            border: "1px solid",
+            borderColor: (theme) =>
+              theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.04)",
+            "& .MuiTabs-flexContainer": { gap: 0.5 },
+            "& .MuiTab-root": {
+              borderRadius: 2,
+              minHeight: 32,
+              fontSize: "0.75rem",
+              py: 0.5,
+              transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+            },
+            "& .MuiTabs-indicator": { display: "none" },
+            "& .Mui-selected": {
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.14)" : "#ffffff",
+              color: "text.primary !important",
+              fontWeight: 600,
+              boxShadow: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 2px 8px rgba(0,0,0,0.3)"
+                  : "0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 0 rgba(255, 255, 255, 0.95)",
+            },
+          }}
+        >
+          <Tab label={t("chat.settings.tabGeneral")} value="general" />
+          <Tab label={t("chat.settings.tabModels")} value="models" />
+          <Tab label={t("chat.settings.tabInterface")} value="interface" />
+          <Tab label={t("chat.settings.tabAudio")} value="audio" />
+        </Tabs>
+      </Box>
 
       <DialogContent sx={{ pt: 2.5, display: "flex", flexDirection: "column", gap: 3, pb: 3 }}>
         {tab === "general" && (

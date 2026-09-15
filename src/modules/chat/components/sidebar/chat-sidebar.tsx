@@ -84,7 +84,7 @@ export function ChatSidebar({
               justifyContent: "center",
               width: 32,
               height: 32,
-              borderRadius: 2.5,
+              borderRadius: "10px",
               bgcolor: "primary.main",
               color: "primary.contrastText",
             }}
@@ -117,7 +117,7 @@ export function ChatSidebar({
 
       {/* New chat + search */}
       <Box
-        sx={{ px: 1.5, pb: 1.5, display: "flex", flexDirection: "column", gap: 1.5, flexShrink: 0 }}
+        sx={{ px: 1.5, pb: 1.5, display: "flex", flexDirection: "column", gap: 1.25, flexShrink: 0 }}
       >
         <Box
           component="button"
@@ -128,16 +128,17 @@ export function ChatSidebar({
             justifyContent: "center",
             gap: 1,
             height: 36,
-            borderRadius: 2,
+            borderRadius: "10px",
             bgcolor: "primary.main",
             color: "primary.contrastText",
             fontSize: "0.8125rem",
             fontWeight: 500,
             border: "none",
             cursor: "pointer",
-            transition: "all 0.15s ease",
+            boxShadow: "inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0,0,0,0.12)",
+            transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
             "&:hover": { bgcolor: "primary.dark" },
-            "&:active": { transform: "scale(0.98)" },
+            "&:active": { transform: "scale(0.97)" },
           }}
         >
           <Plus size={16} strokeWidth={2.2} />
@@ -151,6 +152,11 @@ export function ChatSidebar({
           placeholder={t("chat.sidebar.searchPlaceholder")}
           slotProps={{
             input: {
+              sx: {
+                borderRadius: "10px",
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.03)",
+              },
               startAdornment: (
                 <InputAdornment position="start">
                   <Search size={14} style={{ color: "inherit", opacity: 0.6 }} />
@@ -244,6 +250,8 @@ export function ChatSidebar({
             sx: {
               width: DRAWER_WIDTH,
               bgcolor: "background.paper",
+              backdropFilter: "blur(26px) saturate(190%)",
+              WebkitBackdropFilter: "blur(26px) saturate(190%)",
               borderRight: "1px solid",
               borderColor: "divider",
             },
@@ -267,6 +275,8 @@ export function ChatSidebar({
         borderRight: open ? "1px solid" : "none",
         borderColor: "divider",
         bgcolor: "background.paper",
+        backdropFilter: "blur(24px) saturate(180%)",
+        WebkitBackdropFilter: "blur(24px) saturate(180%)",
         overflow: "hidden",
         transition: "width 0.25s ease, border-color 0.25s ease",
       }}

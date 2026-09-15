@@ -78,6 +78,57 @@
   }
 }
 
+/* ---------- Apple Liquid Glass (iOS 26) ---------- */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.55);
+  --glass-bg-hover: rgba(255, 255, 255, 0.86);
+  --glass-bg-active: rgba(255, 255, 255, 0.94);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-border-subtle: rgba(0, 0, 0, 0.08);
+  --glass-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  --glass-specular-ambient: 0 10px 36px -4px rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  --glass-filter: blur(22px) saturate(180%);
+}
+
+.dark {
+  --glass-bg: rgba(18, 18, 22, 0.72);
+  --glass-bg-subtle: rgba(18, 18, 22, 0.55);
+  --glass-bg-hover: rgba(28, 28, 35, 0.84);
+  --glass-bg-active: rgba(38, 38, 48, 0.92);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-subtle: rgba(255, 255, 255, 0.08);
+  --glass-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+  --glass-specular-ambient: 0 16px 48px -6px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+  --glass-filter: blur(24px) saturate(190%);
+}
+
+.liquid-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-specular-ambient);
+}
+
+.liquid-glass-control {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-filter);
+  -webkit-backdrop-filter: var(--glass-filter);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-specular);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-control:hover {
+  background: var(--glass-bg-hover);
+}
+
+.liquid-glass-control:active {
+  background: var(--glass-bg-active);
+  transform: scale(0.97);
+}
+
 /* ---------- Base ---------- */
 
 * {
@@ -220,8 +271,8 @@ body {
   white-space: nowrap;
 }
 .dark .prose-chat :not(pre) > code {
-  background: var(--color-zinc-800/60);
-  border-color: var(--color-zinc-700/70);
+  background: color-mix(in srgb, var(--color-zinc-800) 60%, transparent);
+  border-color: color-mix(in srgb, var(--color-zinc-700) 70%, transparent);
   color: var(--color-zinc-100);
 }
 .prose-chat table {
@@ -245,7 +296,7 @@ body {
   font-weight: 600;
 }
 .dark .prose-chat th {
-  background: var(--color-zinc-800/50);
+  background: color-mix(in srgb, var(--color-zinc-800) 50%, transparent);
 }
 
 /* ---------- Syntax highlighting (rehype-highlight) adapts to theme ---------- */

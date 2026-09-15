@@ -72,7 +72,16 @@ export default function ChatPage() {
         />
         <Box sx={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
           {!isMobile && (
-            <Box sx={{ width: "50%", borderRight: "1px solid", borderColor: "divider" }}>
+            <Box
+              sx={{
+                width: "50%",
+                borderRight: "1px solid",
+                borderColor: "divider",
+                p: 1.5,
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark" ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.02)",
+              }}
+            >
               <ModelViewerPanel />
             </Box>
           )}

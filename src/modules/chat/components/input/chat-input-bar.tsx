@@ -58,29 +58,39 @@ export function ChatInputBar() {
   const toolButtonSx = (active = false) => ({
     width: 32,
     height: 32,
-    borderRadius: 1.5,
-    color: active ? "primary.contrastText" : "text.disabled",
-    bgcolor: active ? "primary.main" : "transparent",
-    transition: "all 0.15s ease",
+    borderRadius: "8px",
+    color: active ? "primary.contrastText" : "text.secondary",
+    bgcolor: active
+      ? "primary.main"
+      : "transparent",
+    transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
     "&:hover": {
-      bgcolor: active ? "primary.dark" : "action.hover",
+      bgcolor: active
+        ? "primary.dark"
+        : (theme: any) =>
+            theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.05)",
       color: active ? "primary.contrastText" : "text.primary",
     },
+    "&:active": { transform: "scale(0.92)" },
     "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 1 },
   })
 
   const sendButtonSx = {
-    width: 34,
-    height: 34,
+    width: 32,
+    height: 32,
     borderRadius: "50%",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
     bgcolor: "primary.main",
     color: "primary.contrastText",
     border: "none",
     cursor: "pointer",
-    transition: "all 0.15s ease",
+    boxShadow: "inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0,0,0,0.15)",
+    transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
     "&:hover": { bgcolor: "primary.dark" },
-    "&:active": { transform: "scale(0.92)" },
-    "&:disabled": { opacity: 0.35, pointerEvents: "none" },
+    "&:active": { transform: "scale(0.9)" },
+    "&:disabled": { opacity: 0.3, pointerEvents: "none", boxShadow: "none" },
     "&:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 1 },
   }
 
@@ -88,28 +98,36 @@ export function ChatInputBar() {
     <Box
       sx={{
         flexShrink: 0,
-        borderTop: "1px solid",
-        borderColor: "divider",
         background: "transparent",
-        px: { xs: 1, sm: 2 },
-        pb: { xs: 1, sm: 1.5 },
-        pt: { xs: 0.75, sm: 1 },
+        px: { xs: 2, sm: 3 },
+        pb: { xs: 2, sm: 2.5 },
+        pt: 0.5,
       }}
     >
       <Box sx={{ mx: "auto", maxWidth: { xs: "100%", md: 768 } }}>
         <Paper
           elevation={0}
-          variant="outlined"
           sx={{
-            borderRadius: { xs: 2.5, sm: 2 },
-            borderColor: "divider",
+            borderRadius: "18px",
+            border: "1px solid",
+            borderColor: (theme) =>
+              theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
             bgcolor: "background.paper",
+            backdropFilter: "blur(24px) saturate(180%)",
+            WebkitBackdropFilter: "blur(24px) saturate(180%)",
+            boxShadow: (theme) =>
+              theme.palette.mode === "dark"
+                ? "0 16px 40px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.14)"
+                : "0 8px 24px -4px rgba(0, 0, 0, 0.06), inset 0 1px 0 0 rgba(255, 255, 255, 0.95)",
             overflow: "hidden",
-            transition: "all 0.2s ease",
-            boxShadow: "none",
+            transition: "border-color 0.2s ease, box-shadow 0.2s ease",
             "&:focus-within": {
-              borderColor: "text.disabled",
-              boxShadow: "none",
+              borderColor: (theme) =>
+                theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.22)" : "rgba(0, 0, 0, 0.18)",
+              boxShadow: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "0 18px 48px -6px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.2)"
+                  : "0 12px 32px -4px rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 1)",
             },
           }}
         >
@@ -129,8 +147,9 @@ export function ChatInputBar() {
               input: {
                 disableUnderline: true,
                 sx: {
-                  px: { xs: 1.5, sm: 2 },
-                  py: { xs: 1, sm: 1.25 },
+                  px: { xs: 2, sm: 2.25 },
+                  pt: { xs: 1.5, sm: 1.75 },
+                  pb: { xs: 0.75, sm: 1 },
                   fontSize: { xs: "0.9375rem", sm: "0.875rem" },
                   lineHeight: 1.6,
                 },
@@ -143,11 +162,12 @@ export function ChatInputBar() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              px: { xs: 1, sm: 1.25 },
-              pb: { xs: 1, sm: 1.25 },
+              px: { xs: 1.5, sm: 2 },
+              pb: { xs: 1.25, sm: 1.5 },
+              pt: 0.25,
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
               <input ref={fileInputRef} type="file" multiple hidden onChange={handleFileChange} />
               <Tooltip title={t("chat.input.attachFile")}>
                 <IconButton size="small" onClick={() => fileInputRef.current?.click()} sx={toolButtonSx()}>
@@ -181,18 +201,19 @@ export function ChatInputBar() {
                   display: "flex",
                   alignItems: "center",
                   gap: 0.75,
-                  height: 34,
+                  height: 32,
                   px: 1.5,
-                  borderRadius: 8,
+                  borderRadius: "10px",
                   bgcolor: "primary.main",
                   color: "primary.contrastText",
                   fontSize: "0.75rem",
                   fontWeight: 500,
                   border: "none",
                   cursor: "pointer",
-                  transition: "all 0.15s ease",
+                  boxShadow: "inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 2px 6px rgba(0,0,0,0.12)",
+                  transition: "all 0.18s ease",
                   "&:hover": { bgcolor: "primary.dark" },
-                  "&:active": { transform: "scale(0.97)" },
+                  "&:active": { transform: "scale(0.95)" },
                 }}
               >
                 <Square size={12} style={{ fill: "currentColor" }} />
