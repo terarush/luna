@@ -1,0 +1,11 @@
+services:
+  proxy:
+    image: cgr.dev/chainguard/nginx:latest
+    container_name: luna-proxy-dev
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/conf.d/default.conf:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
