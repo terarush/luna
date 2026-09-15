@@ -2,7 +2,7 @@ import * as React from "react"
 import { useTranslation } from "react-i18next"
 import { Box, Typography, Popover, List, ListItemButton, ListItemText, TextField, InputAdornment, Chip, Button, CircularProgress, IconButton } from "@mui/material"
 import { Check, ChevronDown, Search, Sparkles, Plus, RefreshCw } from "lucide-react"
-import { useChatStore, AVAILABLE_MODELS } from "../../hooks/use-chat-store"
+import { useChatStore } from "../../hooks/use-chat-store"
 
 export function ModelSelector() {
   const { t } = useTranslation()
@@ -15,8 +15,8 @@ export function ModelSelector() {
   const [newModelName, setNewModelName] = React.useState("")
   const [newModelKey, setNewModelKey] = React.useState("")
 
-  const currentModel = AVAILABLE_MODELS.find((m) => m.id === selectedModel)
-  const allModels = [...AVAILABLE_MODELS, ...remoteModels]
+  const currentModel = [...remoteModels, ...customModels].find((m) => m.id === selectedModel)
+  const allModels = remoteModels
 
   const filteredModels = React.useMemo(() => {
     if (!search.trim()) return allModels

@@ -3,21 +3,21 @@ import OpenAI from "openai"
 let cachedClient: OpenAI | null = null
 let cachedBaseURL: string | undefined
 
-export function getOpenAIClient(baseURL?: string, apiKey?: string): OpenAI {
-  const key = apiKey ?? import.meta.env.VITE_OPENAI_API_KEY
-  const url = baseURL ?? import.meta.env.VITE_OPENAI_BASE_URL
-
-  if (!key) {
-    throw new Error("OpenAI API key is required. Set VITE_OPENAI_API_KEY or pass it directly.")
+export function getOpenAIClient(baseURL: string, apiKey: string): OpenAI {
+  if (!apiKey) {
+    throw new Error("API key is required. Set it in Settings first.")
+  }
+  if (!baseURL) {
+    throw new Error("API base URL is required. Set it in Settings first.")
   }
 
-  if (!cachedClient || cachedBaseURL !== url) {
+  if (!cachedClient || cachedBaseURL !== baseURL) {
     cachedClient = new OpenAI({
-      apiKey: key,
-      baseURL: url,
+      apiKey,
+      baseURL,
       dangerouslyAllowBrowser: true,
     })
-    cachedBaseURL = url
+    cachedBaseURL = baseURL
   }
 
   return cachedClient

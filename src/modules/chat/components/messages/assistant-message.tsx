@@ -8,7 +8,7 @@ import rehypeHighlight from "rehype-highlight"
 import type { ChatMessage } from "../../types"
 import { ThinkingAccordion } from "./thinking-accordion"
 import { CodeBlock } from "./code-block"
-import { AVAILABLE_MODELS } from "../../hooks/use-chat-store"
+import { useChatStore } from "../../hooks/use-chat-store"
 
 interface AssistantMessageProps {
   message: ChatMessage
@@ -18,7 +18,8 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
   const { t } = useTranslation()
   const [feedback, setFeedback] = React.useState<"good" | "bad" | null>(null)
 
-  const modelName = AVAILABLE_MODELS.find((m) => m.id === message.model)?.name ?? message.model
+  const { remoteModels } = useChatStore()
+  const modelName = remoteModels.find((m) => m.id === message.model)?.name ?? message.model
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content)

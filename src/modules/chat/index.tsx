@@ -6,6 +6,7 @@ import { ChatMessagesContainer } from "./components/messages/chat-messages-conta
 import { ChatInputBar } from "./components/input/chat-input-bar"
 import { ChatParametersSheet } from "./components/modals/chat-parameters-sheet"
 import { ChatSettingsDialog } from "./components/modals/chat-settings-dialog"
+import { ApiSetupDialog } from "./components/modals/api-setup-dialog"
 import { ModelViewerPanel } from "@/components/model-viewer-panel"
 import { useChatStore } from "./hooks/use-chat-store"
 
@@ -15,15 +16,22 @@ export default function ChatPage() {
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
-  const { fetchModels } = useChatStore()
+  const { fetchModels, apiBaseUrl, apiKey } = useChatStore()
+  const [setupOpen, setSetupOpen] = React.useState(false)
+
+  const needsSetup = !apiBaseUrl && !apiKey
 
   // Desktop: open by default. Mobile: closed by default.
   const [sidebarOpen, setSidebarOpen] = React.useState(!isMobile)
 
   // Fetch models on mount
   React.useEffect(() => {
-    fetchModels()
-  }, [fetchModels])
+    if (apiBaseUrl) {
+      fetchModels()
+    } else if (needsSetup) {
+      setSetupOpen(true)
+    }
+  }, [fetchModels, apiBaseUrl, needsSetup])
 
   const { sendMessage } = useChatStore()
 
@@ -84,6 +92,7 @@ export default function ChatPage() {
       </Box>
       <ChatParametersSheet open={paramsOpen} onOpenChange={setParamsOpen} />
       <ChatSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <ApiSetupDialog open={setupOpen} onClose={() => setSetupOpen(false)} />
     </Box>
   )
 }

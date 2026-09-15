@@ -3,7 +3,27 @@ import { persist } from "zustand/middleware"
 import type { ChatSession, ChatMessage, ModelOption, ChatParameters, AttachmentItem } from "../types"
 import { getOpenAIClient } from "@/lib/openai-client"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_OPENAI_BASE_URL || ""
+const ENV_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_OPENAI_BASE_URL || ""
+// Same-origin proxy ke 9Router (vite dev proxy / nginx production) supaya bebas CORS
+const PROXY_BASE_URL = "/api-9router/v1"
+const DEFAULT_BASE_URL = ENV_BASE_URL || PROXY_BASE_URL
+const ROUTER_HOST = "prod-9router.terarush.dev"
+
+// Ubah URL penuh (mis. https://prod-9router.terarush.dev/v1) jadi path proxy same-origin
+// supaya tidak kena CORS; path relatif dibiarkan apa adanya.
+function normalizeBaseUrl(url: string): string {
+  const trimmed = url.trim().replace(/\/+$/, "")
+  if (!trimmed) return trimmed
+  try {
+    const parsed = new URL(trimmed)
+    if (parsed.hostname === ROUTER_HOST) {
+      return `/api-9router${parsed.pathname}`
+    }
+  } catch {
+    // bukan URL absolut — anggap path proxy relatif
+  }
+  return trimmed
+}
 
 export interface CustomModelConfig {
   id: string
@@ -12,41 +32,6 @@ export interface CustomModelConfig {
   apiKey?: string
   tag?: string
 }
-
-export const AVAILABLE_MODELS: ModelOption[] = [
-  {
-    id: "llama3.3:70b",
-    name: "Llama 3.3 70B",
-    tag: "Ollama",
-    provider: "ollama",
-    description: "Meta's state of the art open model with 128k context",
-    contextLength: 131072,
-  },
-  {
-    id: "deepseek-r1:latest",
-    name: "DeepSeek R1",
-    tag: "Reasoning",
-    provider: "ollama",
-    description: "Open reasoning model with chain-of-thought capabilities",
-    contextLength: 65536,
-  },
-  {
-    id: "gpt-4o",
-    name: "GPT-4o",
-    tag: "OpenAI",
-    provider: "openai",
-    description: "Flagship multimodal intelligence from OpenAI",
-    contextLength: 128000,
-  },
-  {
-    id: "claude-3-5-sonnet",
-    name: "Claude 3.5 Sonnet",
-    tag: "Anthropic",
-    provider: "anthropic",
-    description: "Highest level of intelligence and coding capability",
-    contextLength: 200000,
-  },
-]
 
 const DEFAULT_PARAMETERS: ChatParameters = {
   systemPrompt: "You are a helpful, knowledgeable, and concise AI assistant.",
@@ -113,6 +98,8 @@ interface ChatStoreState {
   customModels: CustomModelConfig[]
   remoteModels: ModelOption[]
   isLoadingModels: boolean
+  apiBaseUrl: string
+  apiKey: string
 
   // Actions
   createNewSession: (customTitle?: string) => string
@@ -135,6 +122,8 @@ interface ChatStoreState {
   reset: () => void
   addCustomModel: (model: CustomModelConfig) => void
   removeCustomModel: (id: string) => void
+  setApiBaseUrl: (url: string) => void
+  setApiKey: (key: string) => void
   fetchModels: () => Promise<void>
 }
 
@@ -143,7 +132,7 @@ export const useChatStore = create<ChatStoreState>()(
     (set, get) => ({
       sessions: SEED_SESSIONS,
       activeSessionId: SEED_SESSIONS[0].id,
-      selectedModel: AVAILABLE_MODELS[0].id,
+      selectedModel: "",
       parameters: DEFAULT_PARAMETERS,
       isGenerating: false,
       isSpeaking: false,
@@ -154,24 +143,39 @@ export const useChatStore = create<ChatStoreState>()(
       customModels: [],
       remoteModels: [],
       isLoadingModels: false,
+      apiBaseUrl: DEFAULT_BASE_URL,
+      apiKey: "",
 
       fetchModels: async () => {
         set({ isLoadingModels: true })
         try {
-          const res = await fetch(`${API_BASE_URL}/models`)
+          const baseUrl = normalizeBaseUrl(get().apiBaseUrl || DEFAULT_BASE_URL)
+          if (!baseUrl) {
+            console.warn("No API base URL configured. Set it in Settings or via VITE_API_URL.")
+            set({ remoteModels: [], isLoadingModels: false })
+            return
+          }
+          const res = await fetch(`${baseUrl}/models`, {
+            headers: get().apiKey ? { Authorization: `Bearer ${get().apiKey}` } : undefined,
+          })
+          if (!res.ok) throw new Error(`GET /models failed: ${res.status}`)
           const data = await res.json()
-          const models: ModelOption[] = (data.data || []).map((m: any) => ({
+          const modelList = data?.data ?? []
+          const models: ModelOption[] = modelList.map((m: any) => ({
             id: m.id,
-            name: m.id,
-            tag: "Remote",
+            name: m.name || m.id,
+            tag: m.capabilities?.search ? "Search" : m.capabilities?.audioInput ? "Audio" : "Remote",
             provider: "openai",
-            description: m.id,
-            contextLength: 128000,
+            description: m.description || (m.capabilities?.contextWindow ? `${(m.capabilities.contextWindow / 1048576).toFixed(1)}M ctx` : m.id),
+            contextLength: m.capabilities?.contextWindow ?? m.context_length ?? 128000,
           }))
           set({ remoteModels: models, isLoadingModels: false })
+          if (!get().selectedModel || !models.some((m) => m.id === get().selectedModel)) {
+            set({ selectedModel: models[0]?.id ?? "" })
+          }
         } catch (err) {
           console.error("Failed to fetch models:", err)
-          set({ isLoadingModels: false })
+          set({ remoteModels: [], isLoadingModels: false })
         }
       },
 
@@ -289,15 +293,16 @@ export const useChatStore = create<ChatStoreState>()(
         }))
 
         // Find model config (custom or predefined)
-        const allModels = [...AVAILABLE_MODELS, ...customModels.map((m) => ({ ...m, provider: "custom" as const, contextLength: 128000 }))]
+        const allModels = [...get().remoteModels, ...customModels.map((m) => ({ ...m, provider: "custom" as const, contextLength: 128000 }))]
         const modelConfig = allModels.find((m) => m.id === selectedModel)
         const isOpenAIModel = modelConfig?.provider === "openai" || modelConfig?.provider === "custom"
         const modelBaseURL = "baseURL" in (modelConfig ?? {}) ? (modelConfig as any).baseURL : undefined
         const modelAPIKey = "apiKey" in (modelConfig ?? {}) ? (modelConfig as any).apiKey : undefined
+        const apiKey = modelAPIKey || get().apiKey
 
-        if (isOpenAIModel && modelBaseURL) {
+        if (isOpenAIModel && apiKey && (modelBaseURL || get().apiBaseUrl)) {
           try {
-            const client = getOpenAIClient(modelBaseURL, modelAPIKey)
+            const client = getOpenAIClient(normalizeBaseUrl(modelBaseURL || get().apiBaseUrl || DEFAULT_BASE_URL), apiKey)
             const params = get().parameters
             const stream = await client.chat.completions.create({
               model: selectedModel,
@@ -424,7 +429,7 @@ Let me know if you want to dive deeper or adjust model parameters!`
         set({
           sessions: SEED_SESSIONS,
           activeSessionId: SEED_SESSIONS[0].id,
-          selectedModel: AVAILABLE_MODELS[0].id,
+          selectedModel: "",
           parameters: DEFAULT_PARAMETERS,
           isGenerating: false,
           pendingAttachments: [],
@@ -439,6 +444,8 @@ Let me know if you want to dive deeper or adjust model parameters!`
         set((state) => ({
           customModels: state.customModels.filter((m) => m.id !== id),
         })),
+      setApiBaseUrl: (url) => set({ apiBaseUrl: normalizeBaseUrl(url) }),
+      setApiKey: (key) => set({ apiKey: key }),
     }),
     {
       name: "open-webui-chat-storage",
@@ -448,7 +455,20 @@ Let me know if you want to dive deeper or adjust model parameters!`
         selectedModel: state.selectedModel,
         parameters: state.parameters,
         customModels: state.customModels,
+        apiBaseUrl: state.apiBaseUrl,
+        apiKey: state.apiKey,
       }),
+      // Nilai base URL dari persist dinormalisasi: URL penuh 9router → path proxy,
+      // relative path dibiarkan. apiKey ikut dipulihkan.
+      merge: (persisted, current) => {
+        const p = persisted as Partial<ChatStoreState>
+        return {
+          ...current,
+          ...p,
+          apiBaseUrl: p.apiBaseUrl ? normalizeBaseUrl(p.apiBaseUrl) : current.apiBaseUrl,
+          apiKey: p.apiKey ?? current.apiKey,
+        }
+      },
     }
   )
 )

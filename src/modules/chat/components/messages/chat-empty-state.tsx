@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { Box, Typography, Paper } from "@mui/material"
 import { Code2, Lightbulb, BrainCircuit, Boxes, ArrowUpRight } from "lucide-react"
-import { useChatStore, AVAILABLE_MODELS } from "../../hooks/use-chat-store"
+import { useChatStore } from "../../hooks/use-chat-store"
 
 interface ChatEmptyStateProps {
   onSendPrompt: (prompt: string) => void
@@ -16,8 +16,8 @@ const PROMPTS = [
 
 export function ChatEmptyState({ onSendPrompt }: ChatEmptyStateProps) {
   const { t } = useTranslation()
-  const { selectedModel } = useChatStore()
-  const model = AVAILABLE_MODELS.find((m) => m.id === selectedModel)
+  const { selectedModel, remoteModels } = useChatStore()
+  const model = remoteModels.find((m) => m.id === selectedModel)
 
   return (
     <Box
