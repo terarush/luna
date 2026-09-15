@@ -1,6 +1,15 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import type { ChatSession, ChatMessage, ModelOption, ChatParameters, AttachmentItem } from "../types"
+import { getOpenAIClient } from "@/lib/openai-client"
+
+export interface CustomModelConfig {
+  id: string
+  name: string
+  baseURL: string
+  apiKey?: string
+  tag?: string
+}
 
 export const AVAILABLE_MODELS: ModelOption[] = [
   {
@@ -94,10 +103,12 @@ interface ChatStoreState {
   selectedModel: string
   parameters: ChatParameters
   isGenerating: boolean
+  isSpeaking: boolean
   isWebSearchEnabled: boolean
   isReasoningEnabled: boolean
   searchFilter: string
   pendingAttachments: AttachmentItem[]
+  customModels: CustomModelConfig[]
 
   // Actions
   createNewSession: (customTitle?: string) => string
@@ -115,8 +126,11 @@ interface ChatStoreState {
   updateParameters: (params: Partial<ChatParameters>) => void
   addMessage: (msg: Omit<ChatMessage, "id" | "createdAt">) => void
   sendMessage: (content: string) => Promise<void>
+  setSpeaking: (speaking: boolean) => void
   stopGeneration: () => void
   reset: () => void
+  addCustomModel: (model: CustomModelConfig) => void
+  removeCustomModel: (id: string) => void
 }
 
 export const useChatStore = create<ChatStoreState>()(
@@ -127,10 +141,12 @@ export const useChatStore = create<ChatStoreState>()(
       selectedModel: AVAILABLE_MODELS[0].id,
       parameters: DEFAULT_PARAMETERS,
       isGenerating: false,
+      isSpeaking: false,
       isWebSearchEnabled: false,
       isReasoningEnabled: true,
       searchFilter: "",
       pendingAttachments: [],
+      customModels: [],
 
       createNewSession: (customTitle) => {
         const id = "session-" + Math.random().toString(36).substring(2, 9)
@@ -213,7 +229,7 @@ export const useChatStore = create<ChatStoreState>()(
       },
 
       sendMessage: async (content: string) => {
-        const { activeSessionId, selectedModel, pendingAttachments, isReasoningEnabled, addMessage } = get()
+        const { activeSessionId, selectedModel, pendingAttachments, isReasoningEnabled, addMessage, customModels, setSpeaking } = get()
         if (!content.trim() && pendingAttachments.length === 0) return
 
         // Add user message
@@ -222,9 +238,9 @@ export const useChatStore = create<ChatStoreState>()(
           content,
           attachments: pendingAttachments.length > 0 ? [...pendingAttachments] : undefined,
         })
-        set({ pendingAttachments: [], isGenerating: true })
+        set({ pendingAttachments: [], isGenerating: true, isSpeaking: false })
 
-        // Simulate streaming assistant message
+        // Stream assistant message
         const assistantMsgId = "msg-" + Math.random().toString(36).substring(2, 9)
         const initialAssistantMsg: ChatMessage = {
           id: assistantMsgId,
@@ -245,7 +261,74 @@ export const useChatStore = create<ChatStoreState>()(
           ),
         }))
 
-        // Stream simulation text
+        // Find model config (custom or predefined)
+        const allModels = [...AVAILABLE_MODELS, ...customModels.map((m) => ({ ...m, provider: "custom" as const, contextLength: 128000 }))]
+        const modelConfig = allModels.find((m) => m.id === selectedModel)
+        const isOpenAIModel = modelConfig?.provider === "openai" || modelConfig?.provider === "custom"
+        const modelBaseURL = "baseURL" in (modelConfig ?? {}) ? (modelConfig as any).baseURL : undefined
+        const modelAPIKey = "apiKey" in (modelConfig ?? {}) ? (modelConfig as any).apiKey : undefined
+
+        if (isOpenAIModel && modelBaseURL) {
+          try {
+            const client = getOpenAIClient(modelBaseURL, modelAPIKey)
+            const params = get().parameters
+            const stream = await client.chat.completions.create({
+              model: selectedModel,
+              messages: [
+                ...(params.systemPrompt ? [{ role: "system" as const, content: params.systemPrompt }] : []),
+                ...get().sessions.find((s) => s.id === activeSessionId)?.messages
+                  .filter((m) => m.role === "user")
+                  .map((m) => ({ role: "user" as const, content: m.content })) ?? [],
+              ],
+              temperature: params.temperature,
+              max_tokens: params.contextLength,
+              stream: true,
+            })
+
+            setSpeaking(true)
+            let fullContent = ""
+            for await (const chunk of stream) {
+              if (!get().isGenerating) break
+              const delta = chunk.choices[0]?.delta?.content ?? ""
+              fullContent += delta
+              set((state) => ({
+                sessions: state.sessions.map((s) =>
+                  s.id === activeSessionId
+                    ? {
+                        ...s,
+                        messages: s.messages.map((m) =>
+                          m.id === assistantMsgId ? { ...m, content: fullContent } : m
+                        ),
+                      }
+                    : s
+                ),
+              }))
+            }
+
+            setSpeaking(false)
+            set((state) => ({
+              isGenerating: false,
+              sessions: state.sessions.map((s) =>
+                s.id === activeSessionId
+                  ? {
+                      ...s,
+                      messages: s.messages.map((m) =>
+                        m.id === assistantMsgId
+                          ? { ...m, isStreaming: false, totalTokens: Math.floor(fullContent.length / 4) }
+                          : m
+                      ),
+                    }
+                  : s
+              ),
+            }))
+            return
+          } catch (error) {
+            console.error("OpenAI API error:", error)
+          }
+        }
+
+        // Fallback simulation for non-OpenAI models
+        setSpeaking(true)
         const responseText = `Here is a breakdown in response to **"${content}"** using **${selectedModel}**:
 
 1. **Overview**: Your query touches upon core modular components in modern AI workflows.
@@ -261,7 +344,6 @@ ollama run ${selectedModel}
 
 Let me know if you want to dive deeper or adjust model parameters!`
 
-        // Stream chunks
         let currentText = ""
         const words = responseText.split(" ")
         for (let i = 0; i < words.length; i++) {
@@ -283,7 +365,7 @@ Let me know if you want to dive deeper or adjust model parameters!`
           }))
         }
 
-        // Finalize
+        setSpeaking(false)
         set((state) => ({
           isGenerating: false,
           sessions: state.sessions.map((s) =>
@@ -306,6 +388,7 @@ Let me know if you want to dive deeper or adjust model parameters!`
         }))
       },
 
+      setSpeaking: (speaking) => set({ isSpeaking: speaking }),
       stopGeneration: () => {
         set({ isGenerating: false })
       },
@@ -318,8 +401,17 @@ Let me know if you want to dive deeper or adjust model parameters!`
           parameters: DEFAULT_PARAMETERS,
           isGenerating: false,
           pendingAttachments: [],
+          customModels: [],
         })
       },
+      addCustomModel: (model) =>
+        set((state) => ({
+          customModels: [...state.customModels, model],
+        })),
+      removeCustomModel: (id) =>
+        set((state) => ({
+          customModels: state.customModels.filter((m) => m.id !== id),
+        })),
     }),
     {
       name: "open-webui-chat-storage",
@@ -328,6 +420,7 @@ Let me know if you want to dive deeper or adjust model parameters!`
         activeSessionId: state.activeSessionId,
         selectedModel: state.selectedModel,
         parameters: state.parameters,
+        customModels: state.customModels,
       }),
     }
   )

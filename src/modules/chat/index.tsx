@@ -6,6 +6,7 @@ import { ChatMessagesContainer } from "./components/messages/chat-messages-conta
 import { ChatInputBar } from "./components/input/chat-input-bar"
 import { ChatParametersSheet } from "./components/modals/chat-parameters-sheet"
 import { ChatSettingsDialog } from "./components/modals/chat-settings-dialog"
+import { ModelViewerPanel } from "@/components/model-viewer-panel"
 import { useChatStore } from "./hooks/use-chat-store"
 
 export default function ChatPage() {
@@ -53,7 +54,6 @@ export default function ChatPage() {
           display: "flex",
           flexDirection: "column",
           minWidth: 0,
-          // On desktop constrain max width; on mobile full width
           width: "100%",
         }}
       >
@@ -62,8 +62,25 @@ export default function ChatPage() {
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onOpenParameters={() => setParamsOpen(true)}
         />
-        <ChatMessagesContainer onSendPrompt={handleSendPrompt} />
-        <ChatInputBar />
+        <Box sx={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
+          {!isMobile && (
+            <Box sx={{ width: "50%", borderRight: "1px solid", borderColor: "divider" }}>
+              <ModelViewerPanel />
+            </Box>
+          )}
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              minWidth: 0,
+              maxWidth: isMobile ? "100%" : undefined,
+            }}
+          >
+            <ChatMessagesContainer onSendPrompt={handleSendPrompt} />
+            <ChatInputBar />
+          </Box>
+        </Box>
       </Box>
       <ChatParametersSheet open={paramsOpen} onOpenChange={setParamsOpen} />
       <ChatSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
