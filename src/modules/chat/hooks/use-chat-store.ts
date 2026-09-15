@@ -3,6 +3,8 @@ import { persist } from "zustand/middleware"
 import type { ChatSession, ChatMessage, ModelOption, ChatParameters, AttachmentItem } from "../types"
 import { getOpenAIClient } from "@/lib/openai-client"
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_OPENAI_BASE_URL || ""
+
 export interface CustomModelConfig {
   id: string
   name: string
@@ -109,6 +111,8 @@ interface ChatStoreState {
   searchFilter: string
   pendingAttachments: AttachmentItem[]
   customModels: CustomModelConfig[]
+  remoteModels: ModelOption[]
+  isLoadingModels: boolean
 
   // Actions
   createNewSession: (customTitle?: string) => string
@@ -131,6 +135,7 @@ interface ChatStoreState {
   reset: () => void
   addCustomModel: (model: CustomModelConfig) => void
   removeCustomModel: (id: string) => void
+  fetchModels: () => Promise<void>
 }
 
 export const useChatStore = create<ChatStoreState>()(
@@ -147,6 +152,28 @@ export const useChatStore = create<ChatStoreState>()(
       searchFilter: "",
       pendingAttachments: [],
       customModels: [],
+      remoteModels: [],
+      isLoadingModels: false,
+
+      fetchModels: async () => {
+        set({ isLoadingModels: true })
+        try {
+          const res = await fetch(`${API_BASE_URL}/models`)
+          const data = await res.json()
+          const models: ModelOption[] = (data.data || []).map((m: any) => ({
+            id: m.id,
+            name: m.id,
+            tag: "Remote",
+            provider: "openai",
+            description: m.id,
+            contextLength: 128000,
+          }))
+          set({ remoteModels: models, isLoadingModels: false })
+        } catch (err) {
+          console.error("Failed to fetch models:", err)
+          set({ isLoadingModels: false })
+        }
+      },
 
       createNewSession: (customTitle) => {
         const id = "session-" + Math.random().toString(36).substring(2, 9)

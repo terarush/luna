@@ -15,15 +15,15 @@ export default function ChatPage() {
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+  const { fetchModels } = useChatStore()
 
   // Desktop: open by default. Mobile: closed by default.
   const [sidebarOpen, setSidebarOpen] = React.useState(!isMobile)
 
-  // Close sidebar when switching to mobile
+  // Fetch models on mount
   React.useEffect(() => {
-    if (isMobile) setSidebarOpen(false)
-    else setSidebarOpen(true)
-  }, [isMobile])
+    fetchModels()
+  }, [fetchModels])
 
   const { sendMessage } = useChatStore()
 
